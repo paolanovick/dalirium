@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { categorias } from "../data/categorias";
+import { categorias } from "../../data/categorias";
 
 const Footer = () => {
   return (
