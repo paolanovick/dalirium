@@ -1,7 +1,7 @@
 // =====================================================
 // OBRAS.JS - Cloudinary + n8n (Dalirium)
 // =====================================================
-/* eslint-disable no-unused-vars */
+
 
 const N8N_WEBHOOK_URL = "https://n8n.triptest.com.ar/webhook/dalirium";
 
@@ -14,7 +14,7 @@ const categoryMapping = {
   "medallas-olimpicas": "medallas-olimpicas",
   "juegos-olimpicos": "juegos-olimpicos",
   "litografias": "litografias",
-  "litografías": "litografias",  // ← AGREGA ESTO (con acento)
+  "litografías": "litografias",
   "fotos-textos": "fotos-textos",
   "esculturas": "esculturas",
   "daga": "daga",
@@ -24,48 +24,62 @@ const categoryMapping = {
   "certificados": "certificados",
   "sin-categoria": "coleccion-privada"
 };
+
 // =====================================================
 // UTILIDADES
 // =====================================================
 
-function extractNumber(name) {
+// Extraer timestamp completo (fecha + hora) como número para comparar
+// Formato: 20240829_161344_xxx -> extraemos 20240829161344
+function extractTimestamp(name) {
   if (!name || typeof name !== "string") return 0;
-  const match = name.match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 0;
+  const match = name.match(/(\d{8})_(\d{6})/);
+  if (match) {
+    return parseInt(match[1] + match[2], 10);
+  }
+  return 0;
 }
 
-function generateSlug(base, index) {
-  const clean = base.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  return clean + '-' + String(index + 1).padStart(3, '0');
+// Convertir timestamp a segundos para calcular diferencia de tiempo
+function timestampToSeconds(ts) {
+  const str = ts.toString();
+  if (str.length < 14) return 0;
+  const hours = parseInt(str.slice(8, 10), 10);
+  const minutes = parseInt(str.slice(10, 12), 10);
+  const seconds = parseInt(str.slice(12, 14), 10);
+  return hours * 3600 + minutes * 60 + seconds;
 }
 
-function generateTitle(base, index) {
-  const title = base
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, function(l) { return l.toUpperCase(); });
-  return title + ' #' + (index + 1);
-}
-
-function groupConsecutiveImages(images, maxGap) {
-  if (maxGap === undefined) maxGap = 3;
+// Agrupar imágenes tomadas dentro de X segundos como una misma obra
+function groupConsecutiveImages(images, maxGapSeconds) {
+  if (maxGapSeconds === undefined) maxGapSeconds = 120; // 2 minutos por defecto
   if (!images || images.length === 0) return [];
 
+  // Ordenar por timestamp (fecha + hora)
   var sorted = images.slice().sort(function(a, b) {
-    return extractNumber(a.nombre) - extractNumber(b.nombre);
+    return extractTimestamp(a.public_id) - extractTimestamp(b.public_id);
   });
 
   var groups = [];
   var current = [sorted[0]];
+  var lastTs = extractTimestamp(sorted[0].public_id);
 
   for (var i = 1; i < sorted.length; i++) {
-    var gap = extractNumber(sorted[i].nombre) - extractNumber(sorted[i - 1].nombre);
+    var currentTs = extractTimestamp(sorted[i].public_id);
+    
+    // Calcular diferencia en segundos
+    var lastSeconds = timestampToSeconds(lastTs);
+    var currentSeconds = timestampToSeconds(currentTs);
+    var gap = currentSeconds - lastSeconds;
 
-    if (gap > 0 && gap <= maxGap) {
+    // Si están dentro del rango de tiempo (2 min), misma obra
+    if (gap >= 0 && gap <= maxGapSeconds) {
       current.push(sorted[i]);
     } else {
       groups.push(current);
       current = [sorted[i]];
     }
+    lastTs = currentTs;
   }
 
   groups.push(current);
@@ -100,31 +114,30 @@ function processObras(jsonData) {
   });
 
   // 2️⃣ Por cada carpeta, agrupar en SERIES y crear OBRAS
-// 2️⃣ Por cada carpeta, agrupar en SERIES y crear OBRAS
-Object.keys(imagesByFolder).forEach(function(folderName) {
-  var imagenes = imagesByFolder[folderName];
+  Object.keys(imagesByFolder).forEach(function(folderName) {
+    var imagenes = imagesByFolder[folderName];
 
-  // 🔑 DEDUPLICAR por public_id (eliminar duplicados)
-  var visto = {};
-  imagenes = imagenes.filter(function(img) {
-    var id = img.public_id;
-    if (visto[id]) return false;  // Si ya lo vimos, descartarlo
-    visto[id] = true;
-    return true;
-  });
+    // 🔑 DEDUPLICAR por public_id (eliminar duplicados)
+    var visto = {};
+    imagenes = imagenes.filter(function(img) {
+      var id = img.public_id;
+      if (visto[id]) return false;
+      visto[id] = true;
+      return true;
+    });
 
-  var categoriaKey = folderName
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "-");
+    var categoriaKey = folderName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-");
 
-  var categoria = categoryMapping[categoriaKey] || "coleccion-privada";
-console.log("📁", folderName, "- Antes:", imagesByFolder[folderName].length, "Después:", imagenes.length);
-  // 🔑 Agrupar imágenes por números cercanos (series)
-  var series = groupConsecutiveImages(imagenes, 3);
-  
-  // ... resto igual
+    var categoria = categoryMapping[categoriaKey] || "coleccion-privada";
+    
+    // 🔑 Agrupar imágenes por tiempo (120 seg = 2 min)
+    var series = groupConsecutiveImages(imagenes, 120);
+    
+    console.log("📁", folderName, "- Imágenes:", imagenes.length, "- Obras:", series.length);
 
     // Por cada serie, crear una "obra"
     series.forEach(function(grupo, serieIndex) {
@@ -152,12 +165,12 @@ console.log("📁", folderName, "- Antes:", imagesByFolder[folderName].length, "
         imagenes: grupo.map(img => img.secure_url),
 
         imagenesData: grupo,
-        destacada: serieIndex < 2  // Primeras 2 series destacadas
+        destacada: serieIndex < 2
       });
     });
   });
 
-  console.log("📊 SERIES GENERADAS:", obras.length);
+  console.log("📊 TOTAL OBRAS GENERADAS:", obras.length);
   return obras;
 }
 
@@ -184,8 +197,7 @@ export async function fetchObrasFromN8N() {
       return res.json();
     })
     .then(function(jsonData) {
-      console.log("🔍 RESPUESTA COMPLETA DE n8n:", jsonData);  // ← AGREGA ESTO
-      console.log("🔍 Keys:", Object.keys(jsonData));           // ← Y ESTO
+      console.log("🔍 RESPUESTA DE n8n:", Object.keys(jsonData));
       obrasCache = processObras(jsonData);
       console.log('📊 Obras cargadas:', obrasCache.length);
       return obrasCache;
@@ -198,6 +210,7 @@ export async function fetchObrasFromN8N() {
 
   return loadingPromise;
 }
+
 // =====================================================
 // CONSULTAS
 // =====================================================
