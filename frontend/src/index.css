@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Dali";
+  src: url("/fonts/dali____.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-dali {
+  font-family: "Dali", serif;
+}
