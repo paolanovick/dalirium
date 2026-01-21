@@ -216,15 +216,20 @@ const ObraForm = () => {
                     const isSelected = form.imagenes.includes(img.public_id);
                     const isPrincipal = form.imagenPrincipal === img.public_id;
                     return (
-                      <div 
-                        key={img.public_id}
-                        className={`relative cursor-pointer rounded overflow-hidden border-2 ${
-                          isPrincipal ? 'border-yellow-500' : isSelected ? 'border-green-500' : 'border-transparent'
-                        }`}
-                        onClick={() => toggleImage(img.public_id)}
-                        onDoubleClick={() => setPrincipal(img.public_id)}
-                        title="Click: seleccionar | Doble click: imagen principal"
-                      >
+                    <div 
+  key={img.public_id}
+  className={`relative cursor-pointer rounded overflow-hidden border-2 ${
+    isPrincipal ? 'border-yellow-500' : isSelected ? 'border-green-500' : 'border-transparent'
+  }`}
+  onClick={() => {
+    if (isSelected && !isPrincipal) {
+      setPrincipal(img.public_id);
+    } else {
+      toggleImage(img.public_id);
+    }
+  }}
+  title="Click: seleccionar | Click en seleccionada: hacer principal"
+>
                         <img src={img.thumbnail} alt="" className="w-full h-20 object-cover" />
                         {isPrincipal && (
                           <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs px-1">★</div>
@@ -239,8 +244,8 @@ const ObraForm = () => {
               )}
             </div>
             <p className="text-sm text-gray-400 mt-1">
-              Click para seleccionar | Doble click para imagen principal (★)
-            </p>
+  Click para seleccionar | Click en imagen seleccionada (verde) para hacerla principal (★)
+</p>
             <p className="text-sm text-gray-400">
               Seleccionadas: {form.imagenes.length} | Principal: {form.imagenPrincipal || 'ninguna'}
             </p>
