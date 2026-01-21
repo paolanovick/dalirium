@@ -52,34 +52,44 @@ function timestampToSeconds(ts) {
 
 // Agrupar imágenes tomadas dentro de X segundos como una misma obra
 function groupConsecutiveImages(images, maxGapSeconds) {
-  if (maxGapSeconds === undefined) maxGapSeconds = 120; // 2 minutos por defecto
+  if (maxGapSeconds === undefined) maxGapSeconds = 60; // 1 minuto por defecto
   if (!images || images.length === 0) return [];
 
-  // Ordenar por timestamp (fecha + hora)
+  // Ordenar por timestamp completo (fecha + hora)
   var sorted = images.slice().sort(function(a, b) {
     return extractTimestamp(a.public_id) - extractTimestamp(b.public_id);
   });
 
   var groups = [];
   var current = [sorted[0]];
-  var lastTs = extractTimestamp(sorted[0].public_id);
 
   for (var i = 1; i < sorted.length; i++) {
+    var lastTs = extractTimestamp(sorted[i - 1].public_id);
     var currentTs = extractTimestamp(sorted[i].public_id);
     
-    // Calcular diferencia en segundos
+    // Extraer fecha (YYYYMMDD) y hora (HHMMSS) por separado
+    var lastDate = Math.floor(lastTs / 1000000);
+    var currentDate = Math.floor(currentTs / 1000000);
+    
+    // Si son de días diferentes, es otra obra
+    if (lastDate !== currentDate) {
+      groups.push(current);
+      current = [sorted[i]];
+      continue;
+    }
+    
+    // Mismo día: calcular diferencia en segundos
     var lastSeconds = timestampToSeconds(lastTs);
     var currentSeconds = timestampToSeconds(currentTs);
     var gap = currentSeconds - lastSeconds;
 
-    // Si están dentro del rango de tiempo (2 min), misma obra
+    // Si están dentro del rango de tiempo, misma obra
     if (gap >= 0 && gap <= maxGapSeconds) {
       current.push(sorted[i]);
     } else {
       groups.push(current);
       current = [sorted[i]];
     }
-    lastTs = currentTs;
   }
 
   groups.push(current);
