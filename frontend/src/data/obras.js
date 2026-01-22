@@ -1,12 +1,16 @@
 // =====================================================
-// OBRAS.JS - Cloudinary + n8n (Dalirium)
+// OBRAS.JS - HÍBRIDO: MongoDB + n8n (Dalirium)
+// =====================================================
+// - Si la obra fue editada en admin → usa MongoDB
+// - Si la obra NO fue editada → usa n8n
 // =====================================================
 
-
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.agenciatripnow.site/dalirium';
 const N8N_WEBHOOK_URL = "https://n8n.triptest.com.ar/webhook/dalirium";
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwz6kggqe/image/upload';
 
 // =====================================================
-// MAPEO DE CATEGORÍAS
+// MAPEO DE CATEGORÍAS (para n8n)
 // =====================================================
 const categoryMapping = {
   "relojes": "relojes",
@@ -26,11 +30,9 @@ const categoryMapping = {
 };
 
 // =====================================================
-// UTILIDADES
+// UTILIDADES PARA N8N
 // =====================================================
 
-// Extraer timestamp completo (fecha + hora) como número para comparar
-// Formato: 20240829_161344_xxx -> extraemos 20240829161344
 function extractTimestamp(name) {
   if (!name || typeof name !== "string") return 0;
   const match = name.match(/(\d{8})_(\d{6})/);
@@ -40,7 +42,6 @@ function extractTimestamp(name) {
   return 0;
 }
 
-// Convertir timestamp a segundos para calcular diferencia de tiempo
 function timestampToSeconds(ts) {
   const str = ts.toString();
   if (str.length < 14) return 0;
@@ -50,40 +51,33 @@ function timestampToSeconds(ts) {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-// Agrupar imágenes tomadas dentro de X segundos como una misma obra
-function groupConsecutiveImages(images, maxGapSeconds) {
-  if (maxGapSeconds === undefined) maxGapSeconds = 30; // 1 minuto por defecto
+function groupConsecutiveImages(images, maxGapSeconds = 30) {
   if (!images || images.length === 0) return [];
 
-  // Ordenar por timestamp completo (fecha + hora)
-  var sorted = images.slice().sort(function(a, b) {
-    return extractTimestamp(a.public_id) - extractTimestamp(b.public_id);
-  });
+  const sorted = images.slice().sort((a, b) => 
+    extractTimestamp(a.public_id) - extractTimestamp(b.public_id)
+  );
 
-  var groups = [];
-  var current = [sorted[0]];
+  const groups = [];
+  let current = [sorted[0]];
 
-  for (var i = 1; i < sorted.length; i++) {
-    var lastTs = extractTimestamp(sorted[i - 1].public_id);
-    var currentTs = extractTimestamp(sorted[i].public_id);
+  for (let i = 1; i < sorted.length; i++) {
+    const lastTs = extractTimestamp(sorted[i - 1].public_id);
+    const currentTs = extractTimestamp(sorted[i].public_id);
     
-    // Extraer fecha (YYYYMMDD) y hora (HHMMSS) por separado
-    var lastDate = Math.floor(lastTs / 1000000);
-    var currentDate = Math.floor(currentTs / 1000000);
+    const lastDate = Math.floor(lastTs / 1000000);
+    const currentDate = Math.floor(currentTs / 1000000);
     
-    // Si son de días diferentes, es otra obra
     if (lastDate !== currentDate) {
       groups.push(current);
       current = [sorted[i]];
       continue;
     }
     
-    // Mismo día: calcular diferencia en segundos
-    var lastSeconds = timestampToSeconds(lastTs);
-    var currentSeconds = timestampToSeconds(currentTs);
-    var gap = currentSeconds - lastSeconds;
+    const lastSeconds = timestampToSeconds(lastTs);
+    const currentSeconds = timestampToSeconds(currentTs);
+    const gap = currentSeconds - lastSeconds;
 
-    // Si están dentro del rango de tiempo, misma obra
     if (gap >= 0 && gap <= maxGapSeconds) {
       current.push(sorted[i]);
     } else {
@@ -97,22 +91,21 @@ function groupConsecutiveImages(images, maxGapSeconds) {
 }
 
 // =====================================================
-// PROCESAMIENTO
+// PROCESAR DATOS DE N8N
 // =====================================================
 
-function processObras(jsonData) {
-  var obras = [];
-  var globalId = 1;
-  var imagesByFolder = {};
+function processObrasFromN8N(jsonData) {
+  const obras = [];
+  let globalId = 1;
+  const imagesByFolder = {};
 
-  // 1️⃣ Agrupar imágenes por carpeta
-  Object.keys(jsonData).forEach(function(key) {
-    var responses = jsonData[key];
-    responses.forEach(function(res) {
+  Object.keys(jsonData).forEach(key => {
+    const responses = jsonData[key];
+    responses.forEach(res => {
       if (res.resources && Array.isArray(res.resources)) {
-        res.resources.forEach(function(img) {
-          var folder = img.asset_folder || "sin-carpeta";
-          var folderName = folder.split("/").pop();
+        res.resources.forEach(img => {
+          const folder = img.asset_folder || "sin-carpeta";
+          const folderName = folder.split("/").pop();
 
           if (!imagesByFolder[folderName]) {
             imagesByFolder[folderName] = [];
@@ -123,100 +116,132 @@ function processObras(jsonData) {
     });
   });
 
-  // 2️⃣ Por cada carpeta, agrupar en SERIES y crear OBRAS
-  Object.keys(imagesByFolder).forEach(function(folderName) {
-    var imagenes = imagesByFolder[folderName];
+  Object.keys(imagesByFolder).forEach(folderName => {
+    let imagenes = imagesByFolder[folderName];
 
-    // 🔑 DEDUPLICAR por public_id (eliminar duplicados)
-    var visto = {};
-    imagenes = imagenes.filter(function(img) {
-      var id = img.public_id;
+    // Deduplicar
+    const visto = {};
+    imagenes = imagenes.filter(img => {
+      const id = img.public_id;
       if (visto[id]) return false;
       visto[id] = true;
       return true;
     });
 
-    var categoriaKey = folderName
+    const categoriaKey = folderName
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "-");
 
-    var categoria = categoryMapping[categoriaKey] || "coleccion-privada";
-    
-    // 🔑 Agrupar imágenes por tiempo (120 seg = 2 min)
-    var series = groupConsecutiveImages(imagenes, 120);
-    
-    console.log("📁", folderName, "- Imágenes:", imagenes.length, "- Obras:", series.length);
+    const categoria = categoryMapping[categoriaKey] || "coleccion-privada";
+    const series = groupConsecutiveImages(imagenes, 120);
 
-    // Por cada serie, crear una "obra"
-    series.forEach(function(grupo, serieIndex) {
-      var slugBase = folderName.toLowerCase().replace(/\s+/g, '-');
+    series.forEach((grupo, serieIndex) => {
+      const slugBase = folderName.toLowerCase().replace(/\s+/g, '-');
       
       obras.push({
-        id: globalId++,
+        id: `n8n-${globalId++}`,
         slug: slugBase + '-' + String(serieIndex + 1).padStart(3, '0'),
         categoria: categoria,
         subcategoria: folderName,
         titulo: folderName
           .replace(/-/g, ' ')
           .replace(/\b\w/g, l => l.toUpperCase()) + ' #' + (serieIndex + 1),
-
         descripcion: "",
         tecnica: "",
         dimensiones: "",
         año: "",
         precio: "Consultar",
-
-        // ⭐ Primera imagen de la serie (portada)
         imagenPrincipal: grupo[0].secure_url,
-
-        // ⭐ TODAS las imágenes de esta serie
         imagenes: grupo.map(img => img.secure_url),
-
-        imagenesData: grupo,
-        destacada: serieIndex < 2
+        destacada: serieIndex < 2,
+        orden: 999,
+        source: 'n8n'
       });
     });
   });
 
-  console.log("📊 TOTAL OBRAS GENERADAS:", obras.length);
   return obras;
+}
+
+// =====================================================
+// PROCESAR DATOS DE MONGODB
+// =====================================================
+
+function processObrasFromMongo(data) {
+  return data.map(obra => ({
+    id: obra._id,
+    slug: obra.slug,
+    categoria: obra.categoria,
+    subcategoria: obra.subcategoria || obra.categoria,
+    titulo: obra.titulo,
+    descripcion: obra.descripcion || '',
+    tecnica: obra.tecnica || '',
+    dimensiones: obra.dimensiones || '',
+    año: obra.año || '',
+    precio: obra.precio || 'Consultar',
+    imagenPrincipal: obra.imagenPrincipal.startsWith('http') 
+      ? obra.imagenPrincipal 
+      : `${CLOUDINARY_BASE}/${obra.imagenPrincipal}`,
+    imagenes: (obra.imagenes || []).map(img => 
+      img.startsWith('http') ? img : `${CLOUDINARY_BASE}/${img}`
+    ),
+    destacada: obra.destacada || false,
+    orden: obra.orden || 999,
+    source: 'mongodb'
+  }));
 }
 
 // =====================================================
 // CACHE
 // =====================================================
 
-var obrasCache = null;
-var loadingPromise = null;
+let obrasCache = null;
+let loadingPromise = null;
 
 // =====================================================
-// FETCH DESDE n8n
+// FETCH COMBINADO
 // =====================================================
 
-export async function fetchObrasFromN8N() {
+export async function fetchAllObras() {
   if (obrasCache) return obrasCache;
   if (loadingPromise) return loadingPromise;
 
-  loadingPromise = fetch(N8N_WEBHOOK_URL)
-    .then(function(res) {
-      if (!res.ok) {
-        throw new Error('Error al cargar obras: ' + res.status);
-      }
-      return res.json();
-    })
-    .then(function(jsonData) {
-      console.log("🔍 RESPUESTA DE n8n:", Object.keys(jsonData));
-      obrasCache = processObras(jsonData);
-      console.log('📊 Obras cargadas:', obrasCache.length);
-      return obrasCache;
-    })
-    .catch(function(err) {
-      console.error('❌ Error:', err);
-      loadingPromise = null;
-      throw err;
-    });
+  loadingPromise = Promise.all([
+    // Cargar de MongoDB
+    fetch(`${API_URL}/api/obras`)
+      .then(res => res.ok ? res.json() : [])
+      .catch(() => []),
+    // Cargar de n8n
+    fetch(N8N_WEBHOOK_URL)
+      .then(res => res.ok ? res.json() : {})
+      .catch(() => ({}))
+  ])
+  .then(([mongoData, n8nData]) => {
+    const mongoObras = processObrasFromMongo(mongoData);
+    const n8nObras = processObrasFromN8N(n8nData);
+    
+    console.log('📊 Obras de MongoDB:', mongoObras.length);
+    console.log('📊 Obras de n8n:', n8nObras.length);
+
+    // Crear set de categorías que ya tienen obras en MongoDB
+    const mongoCategories = new Set(mongoObras.map(o => o.categoria));
+    
+    // Filtrar n8n: solo incluir categorías que NO están en MongoDB
+    const n8nFiltered = n8nObras.filter(o => !mongoCategories.has(o.categoria));
+    
+    // Combinar: MongoDB tiene prioridad
+    obrasCache = [...mongoObras, ...n8nFiltered];
+    
+    console.log('📊 Total obras combinadas:', obrasCache.length);
+    return obrasCache;
+  })
+  .catch(err => {
+    console.error('❌ Error:', err);
+    loadingPromise = null;
+    throw err;
+  });
 
   return loadingPromise;
 }
@@ -226,44 +251,38 @@ export async function fetchObrasFromN8N() {
 // =====================================================
 
 export async function getObrasByCategoria(categoriaId) {
-  var obras = await fetchObrasFromN8N();
-  return obras.filter(function(o) {
-    return o.categoria === categoriaId;
-  });
+  const obras = await fetchAllObras();
+  return obras
+    .filter(o => o.categoria === categoriaId)
+    .sort((a, b) => a.orden - b.orden);
 }
 
-export async function getObrasDestacadasByCategoria(categoriaId, limit) {
-  if (limit === undefined) limit = 6;
-  var obras = await fetchObrasFromN8N();
+export async function getObrasDestacadasByCategoria(categoriaId, limit = 6) {
+  const obras = await fetchAllObras();
   return obras
-    .filter(function(o) {
-      return o.categoria === categoriaId && o.destacada;
-    })
+    .filter(o => o.categoria === categoriaId && o.destacada)
+    .sort((a, b) => a.orden - b.orden)
     .slice(0, limit);
 }
 
 export async function getObraBySlug(slug) {
-  var obras = await fetchObrasFromN8N();
-  return obras.find(function(o) {
-    return o.slug === slug;
-  });
+  const obras = await fetchAllObras();
+  return obras.find(o => o.slug === slug);
 }
 
 export async function getObraById(id) {
-  var obras = await fetchObrasFromN8N();
-  return obras.find(function(o) {
-    return o.id === parseInt(id);
-  });
+  const obras = await fetchAllObras();
+  return obras.find(o => o.id === id);
 }
 
 export async function getAllObras() {
-  return await fetchObrasFromN8N();
+  return await fetchAllObras();
 }
 
 export async function getEstadisticas() {
-  var obras = await fetchObrasFromN8N();
-  var stats = {};
-  obras.forEach(function(o) {
+  const obras = await fetchAllObras();
+  const stats = {};
+  obras.forEach(o => {
     stats[o.categoria] = (stats[o.categoria] || 0) + 1;
   });
   return stats;
