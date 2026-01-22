@@ -292,3 +292,46 @@ pm2 delete dalirium-backend               # Eliminar
 **Última actualización**: 21 de Enero de 2025
 
 **Estado**: 🟢 En producción (Frontend + Backend + DB)
+
+Backend (Digital Ocean)
+Se configuró el endpoint de Cloudinary para listar imágenes por carpeta. Las credenciales se agregaron al archivo .env del servidor:
+CLOUDINARY_CLOUD_NAME=dwz6kggqe
+CLOUDINARY_API_KEY=833793194928761
+CLOUDINARY_API_SECRET=[secret]
+El endpoint /api/cloudinary/:carpeta permite al dashboard admin obtener las imágenes disponibles en cada categoría de Cloudinary.
+Dashboard Administrativo
+Se creó un panel de administración accesible en /admin con las siguientes funcionalidades:
+
+Listado de obras con imagen, título, categoría y orden
+Formulario para crear y editar obras
+Selector visual de imágenes desde Cloudinary
+Selección de imagen principal (★) y secundarias (✓)
+Operaciones CRUD completas contra MongoDB
+
+Archivos creados:
+
+src/pages/admin/AdminDashboard.jsx
+src/pages/admin/ObraForm.jsx
+
+Algoritmo de Agrupamiento de Imágenes
+Se mejoró el archivo src/data/obras.js para agrupar automáticamente las fotos de una misma obra basándose en el timestamp del nombre de archivo. Las imágenes tomadas dentro de un intervalo de 15 segundos se consideran parte de la misma obra, donde la primera imagen se establece como principal y las restantes como secundarias.
+Rediseño del Carrusel de Colecciones
+Se implementó un nuevo diseño estilo galería/museo utilizando Swiper.js con las siguientes características:
+
+Efecto coverflow con imagen activa centrada y ampliada
+Marco dorado decorativo (inspirado en la estética de Dalí)
+Fondo con degradado cálido (tonos ámbar y stone)
+Esquinas decorativas en la imagen activa
+Controles de navegación estilizados
+Transiciones suaves entre slides
+
+Dependencia agregada: swiper
+Configuración de Vercel
+Se creó el archivo vercel.json para solucionar el problema de rutas en aplicaciones SPA:
+json{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
+Archivos Modificados
+ArchivoCambiobackend/routes/cloudinary.jsNuevo endpoint para listar imágenesbackend/index.jsAgregada ruta de Cloudinaryfrontend/src/data/obras.jsAlgoritmo de agrupamiento por tiempofrontend/src/components/carousel/CategoryCarousel.jsxRediseño completo con Swiperfrontend/src/pages/Colecciones.jsxSimplificación de lógica de obrasfrontend/src/routes/AppRoutes.jsxRutas del admin agregadasfrontend/vercel.jsonConfiguración de rewrites para SPA

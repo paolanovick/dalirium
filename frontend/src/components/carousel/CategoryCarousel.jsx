@@ -45,32 +45,32 @@ const CategoryCarousel = ({
 
       <div className="relative z-10 pb-8">
         <Swiper
-          modules={[Navigation, EffectCoverflow]}
-          effect="coverflow"
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={1.2}
-          spaceBetween={20}
-          loop={items.length > 3}
-          coverflowEffect={{
-            rotate: 0,
-            stretch: 0,
-            depth: 100,
-            modifier: 2,
-            slideShadows: false,
-          }}
-          navigation={{
-            prevEl: `.prev-${categoria.id}`,
-            nextEl: `.next-${categoria.id}`,
-          }}
-          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-          breakpoints={{
-            640: { slidesPerView: 2.2, spaceBetween: 30 },
-            1024: { slidesPerView: 3.2, spaceBetween: 40 },
-            1280: { slidesPerView: 4, spaceBetween: 50 },
-          }}
-          className="!overflow-visible"
-        >
+  modules={[Navigation, EffectCoverflow]}
+  effect={items.length > 3 ? "coverflow" : "slide"}
+  grabCursor={true}
+  centeredSlides={true}
+  slidesPerView={items.length < 3 ? items.length : 1.2}
+  spaceBetween={20}
+  loop={items.length > 4}
+  coverflowEffect={{
+    rotate: 0,
+    stretch: 0,
+    depth: 100,
+    modifier: 2,
+    slideShadows: false,
+  }}
+  navigation={{
+    prevEl: `.prev-${categoria.id}`,
+    nextEl: `.next-${categoria.id}`,
+  }}
+  onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+  breakpoints={{
+    640: { slidesPerView: items.length < 3 ? items.length : 2.2, spaceBetween: 30 },
+    1024: { slidesPerView: items.length < 4 ? items.length : 3.2, spaceBetween: 40 },
+    1280: { slidesPerView: items.length < 5 ? items.length : 4, spaceBetween: 50 },
+  }}
+  className="!overflow-visible"
+>
           {items.map((item, index) => {
             const isActive = index === activeIndex;
             
