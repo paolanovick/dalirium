@@ -52,7 +52,7 @@ function timestampToSeconds(ts) {
 
 // Agrupar imágenes tomadas dentro de X segundos como una misma obra
 function groupConsecutiveImages(images, maxGapSeconds) {
-  if (maxGapSeconds === undefined) maxGapSeconds = 60; // 1 minuto por defecto
+  if (maxGapSeconds === undefined) maxGapSeconds = 30; // 1 minuto por defecto
   if (!images || images.length === 0) return [];
 
   // Ordenar por timestamp completo (fecha + hora)
