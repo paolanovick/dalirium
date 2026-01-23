@@ -33,6 +33,7 @@ const ObraForm = () => {
   const [cloudinaryImages, setCloudinaryImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Cargar obra si estamos editando
   useEffect(() => {
@@ -61,6 +62,45 @@ const ObraForm = () => {
       console.error('Error cargando imágenes:', error);
     } finally {
       setLoadingImages(false);
+    }
+  };
+
+  // Subir imagen a Cloudinary
+  const handleUploadImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('imagen', file);
+
+      const res = await fetch(`${API_URL}/api/cloudinary/${form.categoria}`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Error al subir imagen');
+
+      const newImage = await res.json();
+      
+      // Agregar la nueva imagen al inicio del listado
+      setCloudinaryImages(prev => [newImage, ...prev]);
+      
+      // Seleccionar automáticamente la imagen subida
+      setForm(prev => ({
+        ...prev,
+        imagenes: [...prev.imagenes, newImage.public_id],
+        imagenPrincipal: prev.imagenPrincipal || newImage.public_id
+      }));
+
+      alert('✅ Imagen subida correctamente');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error al subir la imagen');
+    } finally {
+      setUploading(false);
+      e.target.value = ''; // Reset input
     }
   };
 
@@ -203,10 +243,29 @@ const ObraForm = () => {
 
           {/* Selector de Imágenes de Cloudinary */}
           <div>
-            <label className="block mb-2">
-              Imágenes de Cloudinary ({form.categoria})
-              {loadingImages && <span className="ml-2 text-gray-400">Cargando...</span>}
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label>
+                Imágenes de Cloudinary ({form.categoria})
+                {loadingImages && <span className="ml-2 text-gray-400">Cargando...</span>}
+              </label>
+              
+              {/* Botón subir imagen */}
+              <label className={`cursor-pointer px-4 py-2 rounded text-sm ${
+                uploading 
+                  ? 'bg-gray-600 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}>
+                {uploading ? '⏳ Subiendo...' : '📤 Subir imagen'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadImage}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            
             <div className="bg-gray-800 p-4 rounded border border-gray-700 max-h-80 overflow-y-auto">
               {cloudinaryImages.length === 0 ? (
                 <p className="text-gray-400">No hay imágenes en esta carpeta</p>
@@ -216,20 +275,20 @@ const ObraForm = () => {
                     const isSelected = form.imagenes.includes(img.public_id);
                     const isPrincipal = form.imagenPrincipal === img.public_id;
                     return (
-                    <div 
-  key={img.public_id}
-  className={`relative cursor-pointer rounded overflow-hidden border-2 ${
-    isPrincipal ? 'border-yellow-500' : isSelected ? 'border-green-500' : 'border-transparent'
-  }`}
-  onClick={() => {
-    if (isSelected && !isPrincipal) {
-      setPrincipal(img.public_id);
-    } else {
-      toggleImage(img.public_id);
-    }
-  }}
-  title="Click: seleccionar | Click en seleccionada: hacer principal"
->
+                      <div 
+                        key={img.public_id}
+                        className={`relative cursor-pointer rounded overflow-hidden border-2 ${
+                          isPrincipal ? 'border-yellow-500' : isSelected ? 'border-green-500' : 'border-transparent'
+                        }`}
+                        onClick={() => {
+                          if (isSelected && !isPrincipal) {
+                            setPrincipal(img.public_id);
+                          } else {
+                            toggleImage(img.public_id);
+                          }
+                        }}
+                        title="Click: seleccionar | Click en seleccionada: hacer principal"
+                      >
                         <img src={img.thumbnail} alt="" className="w-full h-20 object-cover" />
                         {isPrincipal && (
                           <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs px-1">★</div>
@@ -244,8 +303,8 @@ const ObraForm = () => {
               )}
             </div>
             <p className="text-sm text-gray-400 mt-1">
-  Click para seleccionar | Click en imagen seleccionada (verde) para hacerla principal (★)
-</p>
+              Click para seleccionar | Click en imagen seleccionada (verde) para hacerla principal (★)
+            </p>
             <p className="text-sm text-gray-400">
               Seleccionadas: {form.imagenes.length} | Principal: {form.imagenPrincipal || 'ninguna'}
             </p>
