@@ -6,6 +6,7 @@ require('dotenv').config();
 const obrasRoutes = require('./routes/obras');
 const errorHandler = require('./middleware/errorHandler');
 const cloudinaryRoutes = require('./routes/cloudinary');
+const accesosRoutes = require('./routes/accesos');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/obras', obrasRoutes);
 app.use('/api/cloudinary', cloudinaryRoutes);
+app.use('/api/accesos', accesosRoutes);
 
 // Error handler
 app.use(errorHandler);
