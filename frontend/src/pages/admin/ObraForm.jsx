@@ -66,6 +66,7 @@ const ObraForm = () => {
   };
 
   // Subir imagen a Cloudinary
+ // Subir imagen directo a Cloudinary
   const handleUploadImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -73,16 +74,24 @@ const ObraForm = () => {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('imagen', file);
+      formData.append('file', file);
+      formData.append('upload_preset', 'dalirium_unsigned');
+      formData.append('folder', `dalirium/${form.categoria}`);
 
-      const res = await fetch(`${API_URL}/api/cloudinary/${form.categoria}`, {
+      const res = await fetch('https://api.cloudinary.com/v1_1/dwz6kggqe/image/upload', {
         method: 'POST',
         body: formData
       });
 
       if (!res.ok) throw new Error('Error al subir imagen');
 
-      const newImage = await res.json();
+      const data = await res.json();
+      
+      const newImage = {
+        public_id: data.public_id,
+        url: data.secure_url,
+        thumbnail: data.secure_url.replace('/upload/', '/upload/w_150,h_150,c_fill/')
+      };
       
       // Agregar la nueva imagen al inicio del listado
       setCloudinaryImages(prev => [newImage, ...prev]);
@@ -100,7 +109,7 @@ const ObraForm = () => {
       alert('❌ Error al subir la imagen');
     } finally {
       setUploading(false);
-      e.target.value = ''; // Reset input
+      e.target.value = '';
     }
   };
 
