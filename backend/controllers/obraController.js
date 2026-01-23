@@ -4,25 +4,29 @@ const Obra = require('../models/Obra');
 exports.getObras = async (req, res, next) => {
   try {
     const { categoria, ordenar } = req.query;
-    let query = {};
-    
+
+    // 🔒 ocultar privadas por defecto
+    let query = { categoria: { $ne: 'coleccion-privada' } };
+
+    // si piden una categoría específica
     if (categoria) {
       query.categoria = categoria;
     }
-    
+
     let obras = await Obra.find(query);
-    
+
     if (ordenar === 'asc') {
       obras.sort((a, b) => a.orden - b.orden);
     } else {
       obras.sort((a, b) => b.orden - a.orden);
     }
-    
+
     res.json(obras);
   } catch (error) {
     next(error);
   }
 };
+
 
 // GET obra por slug
 exports.getObraBySlug = async (req, res, next) => {

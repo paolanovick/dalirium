@@ -77,7 +77,18 @@ const AdminDashboard = () => {
                         className="w-16 h-16 object-cover rounded"
                       />
                     </td>
-                    <td className="p-3">{obra.titulo}</td>
+                    <td className="p-3">
+  <span className="flex items-center gap-2">
+    {obra.titulo}
+
+    {obra.categoria === 'coleccion-privada' && (
+      <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded">
+        🔒 Privada
+      </span>
+    )}
+  </span>
+</td>
+
                     <td className="p-3">{obra.categoria}</td>
                     <td className="p-3">{obra.orden}</td>
                     <td className="p-3 space-x-2">

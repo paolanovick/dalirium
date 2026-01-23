@@ -18,13 +18,15 @@ const ObraDetalle = () => {
     try {
       const data = await getObraBySlug(slug);
       setObra(data);
+      
       setImagenActiva(0);
       
       if (data) {
         const relacionadas = await getObrasByCategoria(data.categoria);
         const filtradas = (relacionadas || [])
-          .filter((o) => o.slug !== slug)
-          .slice(0, 4);
+  .filter(o => o.slug !== slug)
+  .filter(o => o.categoria !== 'coleccion-privada')
+  .slice(0, 4);
         setObrasRelacionadas(filtradas);
       }
     } catch (err) {
@@ -33,6 +35,15 @@ const ObraDetalle = () => {
       setLoading(false);
     }
   }, [slug]);
+  useEffect(() => {
+  if (obra?.categoria === 'coleccion-privada') {
+    const token = sessionStorage.getItem('privada_token');
+    if (!token) {
+      navigate('/coleccion-privada');
+    }
+  }
+}, [obra, navigate]);
+
 
   useEffect(() => {
     cargarObra();
