@@ -5,7 +5,8 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
 ## 🌐 Sitio en Vivo
 
 - **Frontend**: https://dalirium.vercel.app
-- **Backend API**: https://167.172.31.249:3001
+- **Backend API**: https://api.agenciatripnow.site/dalirium
+- **Admin Dashboard**: https://dalirium.vercel.app/admin
 - **GitHub**: https://github.com/paolanovick/dalirium
 
 ---
@@ -22,6 +23,11 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
                    Tailwind CSS + Router
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
+│                      NGINX (Reverse Proxy)                      │
+│              api.agenciatripnow.site - SSL/HTTPS               │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
 │                     BACKEND API (Node.js)                       │
 │              Digital Ocean - Puerto 3001 (PM2)                  │
 │                      Express.js + Mongoose                      │
@@ -31,8 +37,8 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
         │                    │                    │
         ▼                    ▼                    ▼
    ┌─────────┐          ┌──────────┐        ┌──────────┐
-   │ MongoDB │          │Cloudinary│        │  n8n    │
-   │ Atlas   │          │ (Imágenes)        │(Webhook)│
+   │ MongoDB │          │Cloudinary│        │   n8n    │
+   │ Atlas   │          │(Imágenes)│        │(Webhook) │
    └─────────┘          └──────────┘        └──────────┘
 ```
 
@@ -41,40 +47,77 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
 ## 🎯 Características Principales
 
 ### Frontend (Vercel)
-- ✅ **Galería Interactiva**: Carruseles con scroll suave
-- ✅ **Categorías Dinámicas**: Relojes, Vajilla, Cuadros, Esculturas, etc.
+- ✅ **Galería Interactiva**: Carruseles con efecto coverflow (Swiper.js)
+- ✅ **Categorías Dinámicas**: Relojes, Vajilla, Cuadros, Esculturas, Litografías, etc.
 - ✅ **Loading State**: Spinner mientras carga las obras
 - ✅ **Responsive Design**: Móvil, tablet y desktop
 - ✅ **Footer Dinámico**: Categorías generadas automáticamente
 - ✅ **Deduplicación de Imágenes**: Sin duplicados en la galería
-- ✅ **Detalle de Obra**: Vista completa con miniaturas (estilo MercadoLibre)
+- ✅ **Detalle de Obra**: Vista completa con miniaturas
+- ✅ **Sistema Híbrido**: Combina datos de MongoDB (editados) y n8n (automáticos)
 
 ### Backend (Digital Ocean)
 - ✅ **API RESTful**: CRUD completo de obras
-- ✅ **MongoDB**: Base de datos en la nube (Atlas)
-- ✅ **Autenticación**: Login para panel admin (próximamente)
-- ✅ **CORS**: Integración segura con frontend
+- ✅ **MongoDB Atlas**: Base de datos en la nube
+- ✅ **CORS Configurado**: Integración segura con frontend
 - ✅ **PM2**: Mantiene servidor corriendo 24/7
+- ✅ **Nginx + SSL**: HTTPS via Let's Encrypt
 
-### Base de Datos
+### Dashboard Admin
+- ✅ **Panel de Administración**: Accesible en `/admin`
+- ✅ **CRUD de Obras**: Crear, editar, eliminar obras
+- ✅ **Selector Visual de Imágenes**: Muestra imágenes de Cloudinary
+- ✅ **Imagen Principal (★)**: Selección con un click
+- ✅ **Imágenes Secundarias (✓)**: Multi-selección
+- ✅ **Subida de Imágenes**: Directo a Cloudinary desde el navegador
+
+### Base de Datos (MongoDB)
 ```javascript
 {
   _id: ObjectId(),
-  slug: "vajilla-001",
-  titulo: "Vajilla #1",
-  categoria: "vajilla",
-  subcategoria: "vajilla",
-  imagenPrincipal: "20240829_163819_gsebhp",  // public_id Cloudinary
+  slug: "litografia-001",
+  titulo: "Litografía Don Quijote",
+  categoria: "litografias",
+  subcategoria: "litografias",
+  imagenPrincipal: "dalirium/litografias/imagen_abc123",  // public_id Cloudinary
   imagenes: [
-    "20240829_163819_gsebhp",
-    "20240829_163814_uekret",
-    "20240829_163807_byf15m"
+    "dalirium/litografias/imagen_abc123",
+    "dalirium/litografias/imagen_def456",
+    "dalirium/litografias/imagen_ghi789"
   ],
   orden: 1,
   precio: "Consultar",
+  descripcion: "",
+  tecnica: "",
+  dimensiones: "",
+  año: "",
+  destacada: true,
   createdAt: Date,
   updatedAt: Date
 }
+```
+
+---
+
+## 🔄 Sistema Híbrido de Datos
+
+El frontend combina dos fuentes de datos:
+
+### MongoDB (Prioridad)
+- Obras editadas/creadas desde el admin
+- Control total sobre imagen principal y secundarias
+- Si una **categoría** tiene obras en MongoDB, usa solo esas
+
+### n8n (Fallback)
+- Obras automáticas vía webhook
+- Agrupamiento por timestamp (imágenes tomadas en 2 minutos = misma obra)
+- Se usa para categorías **no editadas** en el admin
+
+```javascript
+// Lógica en obras.js
+const mongoCategories = new Set(mongoObras.map(o => o.categoria));
+const n8nFiltered = n8nObras.filter(o => !mongoCategories.has(o.categoria));
+obrasCache = [...mongoObras, ...n8nFiltered];
 ```
 
 ---
@@ -117,18 +160,13 @@ npm start
 
 Servidor en `http://localhost:3001`
 
-**Desarrollo con hot-reload:**
-```bash
-npm run dev  # (requiere nodemon instalado)
-```
-
 ---
 
 ## 🔑 Variables de Entorno
 
-### Frontend (`.env.local`)
+### Frontend (Vercel - Environment Variables)
 ```
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=https://api.agenciatripnow.site/dalirium
 ```
 
 ### Backend (`.env`)
@@ -136,8 +174,14 @@ VITE_API_URL=http://localhost:3001
 PORT=3001
 MONGODB_URI=mongodb+srv://usuario:password@cluster.mongodb.net/dalirium
 NODE_ENV=production
-JWT_SECRET=tu_secret_key_aqui
+CLOUDINARY_CLOUD_NAME=dwz6kggqe
+CLOUDINARY_API_KEY=833793194928761
+CLOUDINARY_API_SECRET=[secret]
 ```
+
+### Cloudinary
+- **Upload Preset**: `dalirium_unsigned` (Unsigned, para subida desde frontend)
+- **Carpetas**: `dalirium/{categoria}` (ej: `dalirium/litografias`)
 
 ---
 
@@ -153,9 +197,9 @@ PUT    /api/obras/:id          # Actualizar obra (admin)
 DELETE /api/obras/:id          # Eliminar obra (admin)
 ```
 
-### Categorías
+### Cloudinary
 ```
-GET    /api/categorias         # Obtener todas las categorías
+GET    /api/cloudinary/:carpeta    # Listar imágenes de una carpeta
 ```
 
 ### Health Check
@@ -169,60 +213,79 @@ GET    /api/health             # Verificar estado del servidor
 
 ### Frontend
 - **React 19** - Framework UI
-- **Vite** - Build tool (dev server ultra rápido)
+- **Vite** - Build tool
 - **React Router v7** - Navegación SPA
 - **Tailwind CSS** - Estilos utilitarios
-- **Motion** - Animaciones fluidas
+- **Swiper.js** - Carruseles con efecto coverflow
 
 ### Backend
 - **Node.js 20** - Runtime JavaScript
 - **Express.js** - Framework web
 - **Mongoose** - ODM para MongoDB
+- **Multer** - Manejo de archivos
 - **PM2** - Process manager
 - **CORS** - Cross-origin requests
-- **dotenv** - Variables de entorno
 
-### Base de Datos & Servicios
-- **MongoDB Atlas** - Base de datos en la nube (free tier)
-- **Cloudinary** - CDN para imágenes
-- **Digital Ocean** - VPS (2GB RAM, Ubuntu 25.04)
+### Infraestructura
+- **MongoDB Atlas** - Base de datos en la nube
+- **Cloudinary** - CDN para imágenes + Upload directo
+- **Digital Ocean** - VPS (Ubuntu)
+- **Nginx** - Reverse proxy + SSL
+- **Let's Encrypt** - Certificados SSL
 - **Vercel** - Hosting frontend
-- **GitHub** - Control de versiones
+- **n8n** - Automatización de webhooks
 
 ---
 
 ## 📊 Flujo de Datos
 
-1. **Usuario accede** → https://dalirium.vercel.app
-2. **Frontend carga** → React renderiza la página
-3. **Spinner aparece** → "Cargando obras..."
-4. **API llama al backend** → GET `/api/obras`
-5. **Backend consulta MongoDB** → Devuelve obras
-6. **Cloudinary sirve imágenes** → URLs desde CDN
-7. **Carrusel renderiza** → Galerías por categoría
+### Galería Pública
+1. Usuario accede → https://dalirium.vercel.app
+2. Frontend carga → React renderiza
+3. `obras.js` consulta MongoDB y n8n en paralelo
+4. Combina resultados (MongoDB tiene prioridad por categoría)
+5. Cloudinary sirve imágenes
+6. Carrusel renderiza obras
+
+### Admin Dashboard
+1. Admin accede → https://dalirium.vercel.app/admin
+2. Crea/edita obra → Selecciona categoría
+3. Frontend consulta → `GET /api/cloudinary/{categoria}`
+4. Muestra imágenes de Cloudinary
+5. Admin selecciona principal (★) y secundarias (✓)
+6. Puede subir nuevas imágenes → Directo a Cloudinary
+7. Guarda → `POST/PUT /api/obras`
+8. Datos en MongoDB
 
 ---
 
-## 🔄 Próximos Pasos
+## 🔧 Configuración Nginx
 
-### Fase 2: Dashboard Admin
-- [ ] Pantalla de login
-- [ ] CRUD de obras con UI
-- [ ] Selector de imágenes de Cloudinary
-- [ ] Drag & drop para ordenar
-- [ ] Cambiar imagen principal
+```nginx
+# /etc/nginx/sites-available/api.agenciatripnow.site
 
-### Fase 3: Colección Privada
-- [ ] Autenticación de usuario
-- [ ] Obras exclusivas con acceso restringido
-- [ ] Formulario de consulta en contacto
+server {
+    listen 443 ssl http2;
+    server_name api.agenciatripnow.site;
+    
+    ssl_certificate /etc/letsencrypt/live/api.agenciatripnow.site/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.agenciatripnow.site/privkey.pem;
 
-### Fase 4: Mejoras
-- [ ] Búsqueda de obras
-- [ ] Filtros avanzados
-- [ ] Optimización de imágenes
-- [ ] Dark/Light mode
-- [ ] Multi-idioma
+    # n8n
+    location / {
+        proxy_pass http://localhost:5678;
+        # ... headers
+    }
+
+    # Dalirium Backend
+    location /dalirium/ {
+        proxy_pass http://localhost:3001/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
 
 ---
 
@@ -248,29 +311,80 @@ pm2 restart dalirium-backend
 pm2 logs dalirium-backend
 ```
 
+### Nginx (Si se modifica)
+```bash
+nginx -t
+systemctl reload nginx
+```
+
 ---
 
-## 📝 Notas de Desarrollo
+## 📝 Notas Técnicas
 
-### Deduplicación de Imágenes
-Las imágenes se deduplicación por `public_id` de Cloudinary para evitar duplicados que n8n trae múltiples veces.
+### MongoDB Atlas - IP Whitelist
+El servidor de Digital Ocean (`167.172.31.249`) debe estar en la whitelist de MongoDB Atlas para conectarse.
 
-### Variables de Entorno Sensibles
-**NUNCA** commitear `.env` con credenciales reales. Usar `.env.example`:
-```bash
-cp .env.example .env
-# Completar valores locales
+### Cloudinary Upload Preset
+- Nombre: `dalirium_unsigned`
+- Modo: **Unsigned** (permite subida desde frontend)
+- Las imágenes se organizan en carpetas: `dalirium/{categoria}`
+
+### CORS
+Configurado en Express para permitir requests desde cualquier origen:
+```javascript
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 ```
 
 ### PM2 Comandos Útiles
 ```bash
-pm2 start index.js --name "dalirium"      # Iniciar
-pm2 list                                   # Listar procesos
-pm2 logs dalirium-backend                 # Ver logs
-pm2 restart dalirium-backend              # Reiniciar
-pm2 stop dalirium-backend                 # Detener
-pm2 delete dalirium-backend               # Eliminar
+pm2 list                          # Listar procesos
+pm2 logs dalirium-backend         # Ver logs
+pm2 restart dalirium-backend      # Reiniciar
+pm2 stop dalirium-backend         # Detener
 ```
+
+---
+
+## ✅ Features Completados
+
+### Dashboard Admin
+- [x] Listado de obras con imagen, título, categoría y orden
+- [x] Formulario para crear y editar obras
+- [x] Selector visual de imágenes desde Cloudinary
+- [x] Selección de imagen principal (★) y secundarias (✓)
+- [x] Subida de imágenes directo a Cloudinary
+- [x] Operaciones CRUD completas contra MongoDB
+
+### Sistema Híbrido
+- [x] Carga paralela de MongoDB y n8n
+- [x] Prioridad por categoría a MongoDB
+- [x] Fallback a n8n para categorías no editadas
+
+### Carrusel
+- [x] Efecto coverflow con Swiper.js
+- [x] Marco dorado decorativo (estética Dalí)
+- [x] Fondo con degradado cálido
+- [x] Transiciones suaves
+
+---
+
+## 🔜 Próximos Pasos
+
+### Fase 3: Colección Privada
+- [ ] Autenticación de usuario
+- [ ] Obras exclusivas con acceso restringido
+- [ ] Formulario de consulta en contacto
+
+### Fase 4: Mejoras
+- [ ] Búsqueda de obras
+- [ ] Filtros avanzados
+- [ ] Dark/Light mode
+- [ ] Multi-idioma
+- [ ] Login para admin
 
 ---
 
@@ -287,51 +401,8 @@ pm2 delete dalirium-backend               # Eliminar
 
 © 2025 Dalirium. Todos los derechos reservados.
 
+---
 
+**Última actualización**: 23 de Enero de 2026
 
-**Última actualización**: 21 de Enero de 2025
-
-**Estado**: 🟢 En producción (Frontend + Backend + DB)
-
-Backend (Digital Ocean)
-Se configuró el endpoint de Cloudinary para listar imágenes por carpeta. Las credenciales se agregaron al archivo .env del servidor:
-CLOUDINARY_CLOUD_NAME=dwz6kggqe
-CLOUDINARY_API_KEY=833793194928761
-CLOUDINARY_API_SECRET=[secret]
-El endpoint /api/cloudinary/:carpeta permite al dashboard admin obtener las imágenes disponibles en cada categoría de Cloudinary.
-Dashboard Administrativo
-Se creó un panel de administración accesible en /admin con las siguientes funcionalidades:
-
-Listado de obras con imagen, título, categoría y orden
-Formulario para crear y editar obras
-Selector visual de imágenes desde Cloudinary
-Selección de imagen principal (★) y secundarias (✓)
-Operaciones CRUD completas contra MongoDB
-
-Archivos creados:
-
-src/pages/admin/AdminDashboard.jsx
-src/pages/admin/ObraForm.jsx
-
-Algoritmo de Agrupamiento de Imágenes
-Se mejoró el archivo src/data/obras.js para agrupar automáticamente las fotos de una misma obra basándose en el timestamp del nombre de archivo. Las imágenes tomadas dentro de un intervalo de 15 segundos se consideran parte de la misma obra, donde la primera imagen se establece como principal y las restantes como secundarias.
-Rediseño del Carrusel de Colecciones
-Se implementó un nuevo diseño estilo galería/museo utilizando Swiper.js con las siguientes características:
-
-Efecto coverflow con imagen activa centrada y ampliada
-Marco dorado decorativo (inspirado en la estética de Dalí)
-Fondo con degradado cálido (tonos ámbar y stone)
-Esquinas decorativas en la imagen activa
-Controles de navegación estilizados
-Transiciones suaves entre slides
-
-Dependencia agregada: swiper
-Configuración de Vercel
-Se creó el archivo vercel.json para solucionar el problema de rutas en aplicaciones SPA:
-json{
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
-Archivos Modificados
-ArchivoCambiobackend/routes/cloudinary.jsNuevo endpoint para listar imágenesbackend/index.jsAgregada ruta de Cloudinaryfrontend/src/data/obras.jsAlgoritmo de agrupamiento por tiempofrontend/src/components/carousel/CategoryCarousel.jsxRediseño completo con Swiperfrontend/src/pages/Colecciones.jsxSimplificación de lógica de obrasfrontend/src/routes/AppRoutes.jsxRutas del admin agregadasfrontend/vercel.jsonConfiguración de rewrites para SPA
+**Estado**: 🟢 En producción (Frontend + Backend + Admin + Sistema Híbrido)
