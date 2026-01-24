@@ -12,8 +12,9 @@ cloudinary.config({
 router.get('/:carpeta', async (req, res) => {
   try {
     const { carpeta } = req.params;
+
     const result = await cloudinary.search
-      .expression(`folder:dalirium/${carpeta}`)
+      .expression(`folder:dalirium/${carpeta}/*`)
       .sort_by('public_id', 'asc')
       .max_results(500)
       .execute();
@@ -21,7 +22,11 @@ router.get('/:carpeta', async (req, res) => {
     const imagenes = result.resources.map(img => ({
       public_id: img.public_id,
       url: img.secure_url,
-      thumbnail: cloudinary.url(img.public_id, { width: 150, height: 150, crop: 'fill' })
+      thumbnail: cloudinary.url(img.public_id, {
+        width: 150,
+        height: 150,
+        crop: 'fill'
+      })
     }));
 
     res.json(imagenes);
