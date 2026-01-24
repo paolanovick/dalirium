@@ -2,10 +2,25 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const CATEGORIAS = [
+  'relojes',
+  'litografias',
+  'cuadros',
+  'cuadros-chicos',
+  'esculturas',
+  'medallas-olimpicas',
+  'juegos-olimpicos',
+  'vajilla',
+  'fotos-textos',
+  'daga',
+  'certificados',
+  'coleccion-privada'
+];
 
 const AdminDashboard = () => {
   const [obras, setObras] = useState([]);
   const [loading, setLoading] = useState(true);
+const [categoriaActiva, setCategoriaActiva] = useState('relojes');
 
   useEffect(() => {
     fetchObras();
@@ -33,8 +48,13 @@ const AdminDashboard = () => {
       console.error('Error:', error);
     }
   };
+const obrasFiltradas = obras.filter(
+  obra => obra.categoria === categoriaActiva
+);
 
-  if (loading) return <div className="p-8 text-white">Cargando...</div>;
+if (loading) {
+  return <div className="p-8 text-white">Cargando...</div>;
+}
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
@@ -48,6 +68,21 @@ const AdminDashboard = () => {
             + Nueva Obra
           </Link>
         </div>
+<div className="flex flex-wrap gap-2 mb-6">
+  {CATEGORIAS.map(cat => (
+    <button
+      key={cat}
+      onClick={() => setCategoriaActiva(cat)}
+      className={`px-4 py-2 rounded text-sm ${
+        categoriaActiva === cat
+          ? 'bg-blue-600'
+          : 'bg-gray-700 hover:bg-gray-600'
+      }`}
+    >
+      {cat}
+    </button>
+  ))}
+</div>
 
         <div className="bg-gray-800 rounded-lg overflow-hidden">
           <table className="w-full">
@@ -56,6 +91,7 @@ const AdminDashboard = () => {
                 <th className="p-3 text-left">Imagen</th>
                 <th className="p-3 text-left">Título</th>
                 <th className="p-3 text-left">Categoría</th>
+                <th className="p-3 text-left">Imágenes</th>
                 <th className="p-3 text-left">Orden</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
@@ -68,7 +104,8 @@ const AdminDashboard = () => {
                   </td>
                 </tr>
               ) : (
-                obras.map(obra => (
+               obrasFiltradas.map(obra => (
+
                   <tr key={obra._id} className="border-t border-gray-700 hover:bg-gray-750">
                     <td className="p-3">
                       <img 
@@ -90,6 +127,10 @@ const AdminDashboard = () => {
 </td>
 
                     <td className="p-3">{obra.categoria}</td>
+                    <td className="p-3">
+  {obra.imagenes?.length || 0}
+</td>
+
                     <td className="p-3">{obra.orden}</td>
                     <td className="p-3 space-x-2">
                       <Link 
