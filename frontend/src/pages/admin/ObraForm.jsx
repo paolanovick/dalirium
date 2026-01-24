@@ -249,6 +249,59 @@ const ObraForm = () => {
               />
             </div>
           </div>
+{/* Imágenes actuales de la obra (aunque no estén en Cloudinary) */}
+{form.imagenes.length > 0 && (
+  <div className="mb-6">
+    <h3 className="text-sm text-gray-300 mb-2">
+      Imágenes actuales de la obra
+    </h3>
+
+    <div className="flex flex-wrap gap-3">
+      {form.imagenes.map((img) => (
+        <div
+          key={img}
+          className="relative w-24 h-24 border border-gray-600 rounded overflow-hidden"
+        >
+          <img
+            src={`https://res.cloudinary.com/dwz6kggqe/image/upload/w_150,h_150,c_fill/${img}`}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+
+          <button
+            type="button"
+            onClick={() => {
+              setForm((prev) => {
+                const nuevasImagenes = prev.imagenes.filter(
+                  (i) => i !== img
+                );
+
+                return {
+                  ...prev,
+                  imagenes: nuevasImagenes,
+                  imagenPrincipal:
+                    prev.imagenPrincipal === img
+                      ? nuevasImagenes[0] || ''
+                      : prev.imagenPrincipal
+                };
+              });
+            }}
+            className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white text-xs px-1 rounded"
+            title="Eliminar imagen"
+          >
+            ✕
+          </button>
+
+          {form.imagenPrincipal === img && (
+            <div className="absolute bottom-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center">
+              Principal
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
           {/* Selector de Imágenes de Cloudinary */}
           <div>
