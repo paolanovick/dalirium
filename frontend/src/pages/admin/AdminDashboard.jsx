@@ -109,7 +109,10 @@ if (loading) {
                   <tr key={obra._id} className="border-t border-gray-700 hover:bg-gray-750">
                     <td className="p-3">
                       <img 
-                        src={`https://res.cloudinary.com/dwz6kggqe/image/upload/w_80,h_80,c_fill/${obra.imagenPrincipal}`}
+                       src={obra.imagenPrincipal.startsWith('http') 
+  ? obra.imagenPrincipal.replace('/upload/', '/upload/w_80,h_80,c_fill/')
+  : `https://res.cloudinary.com/dwz6kggqe/image/upload/w_80,h_80,c_fill/${obra.imagenPrincipal}`
+}
                         alt={obra.titulo}
                         className="w-16 h-16 object-cover rounded"
                       />
