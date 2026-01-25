@@ -65,8 +65,7 @@ const ObraForm = () => {
     }
   };
 
-  // Subir imagen a Cloudinary
- // Subir imagen directo a Cloudinary
+  // Subir imagen directo a Cloudinary
   const handleUploadImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -96,11 +95,11 @@ const ObraForm = () => {
       // Agregar la nueva imagen al inicio del listado
       setCloudinaryImages(prev => [newImage, ...prev]);
       
-      // Seleccionar automáticamente la imagen subida
+      // Seleccionar automáticamente la imagen subida (guardar URL completa)
       setForm(prev => ({
         ...prev,
-        imagenes: [...prev.imagenes, newImage.public_id],
-        imagenPrincipal: prev.imagenPrincipal || newImage.public_id
+        imagenes: [...prev.imagenes, newImage.url],
+        imagenPrincipal: prev.imagenPrincipal || newImage.url
       }));
 
       alert('✅ Imagen subida correctamente');
@@ -136,12 +135,13 @@ const ObraForm = () => {
     }
   };
 
-  const toggleImage = (public_id) => {
+  // Ahora recibe el objeto img completo
+  const toggleImage = (img) => {
     setForm(prev => {
-      const exists = prev.imagenes.includes(public_id);
+      const exists = prev.imagenes.includes(img.url);
       const newImagenes = exists 
-        ? prev.imagenes.filter(img => img !== public_id)
-        : [...prev.imagenes, public_id];
+        ? prev.imagenes.filter(i => i !== img.url)
+        : [...prev.imagenes, img.url];
       
       // Si es la primera imagen, setearla como principal
       const newPrincipal = newImagenes.length > 0 && !newImagenes.includes(prev.imagenPrincipal)
@@ -156,8 +156,8 @@ const ObraForm = () => {
     });
   };
 
-  const setPrincipal = (public_id) => {
-    setForm(prev => ({ ...prev, imagenPrincipal: public_id }));
+  const setPrincipal = (url) => {
+    setForm(prev => ({ ...prev, imagenPrincipal: url }));
   };
 
   const handleSubmit = async (e) => {
@@ -186,6 +186,14 @@ const ObraForm = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Helper para obtener thumbnail de una URL
+  const getThumbnail = (imgUrl) => {
+    if (imgUrl.startsWith('http')) {
+      return imgUrl.replace('/upload/', '/upload/w_150,h_150,c_fill/');
+    }
+    return `https://res.cloudinary.com/dwz6kggqe/image/upload/w_150,h_150,c_fill/${imgUrl}`;
   };
 
   return (
@@ -249,59 +257,60 @@ const ObraForm = () => {
               />
             </div>
           </div>
-{/* Imágenes actuales de la obra (aunque no estén en Cloudinary) */}
-{form.imagenes.length > 0 && (
-  <div className="mb-6">
-    <h3 className="text-sm text-gray-300 mb-2">
-      Imágenes actuales de la obra
-    </h3>
 
-    <div className="flex flex-wrap gap-3">
-      {form.imagenes.map((img) => (
-        <div
-          key={img}
-          className="relative w-24 h-24 border border-gray-600 rounded overflow-hidden"
-        >
-          <img
-            src={`https://res.cloudinary.com/dwz6kggqe/image/upload/w_150,h_150,c_fill/${img}`}
-            alt=""
-            className="w-full h-full object-cover"
-          />
+          {/* Imágenes actuales de la obra */}
+          {form.imagenes.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-sm text-gray-300 mb-2">
+                Imágenes actuales de la obra
+              </h3>
 
-          <button
-            type="button"
-            onClick={() => {
-              setForm((prev) => {
-                const nuevasImagenes = prev.imagenes.filter(
-                  (i) => i !== img
-                );
+              <div className="flex flex-wrap gap-3">
+                {form.imagenes.map((img) => (
+                  <div
+                    key={img}
+                    className="relative w-24 h-24 border border-gray-600 rounded overflow-hidden"
+                  >
+                    <img
+                      src={getThumbnail(img)}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
 
-                return {
-                  ...prev,
-                  imagenes: nuevasImagenes,
-                  imagenPrincipal:
-                    prev.imagenPrincipal === img
-                      ? nuevasImagenes[0] || ''
-                      : prev.imagenPrincipal
-                };
-              });
-            }}
-            className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white text-xs px-1 rounded"
-            title="Eliminar imagen"
-          >
-            ✕
-          </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => {
+                          const nuevasImagenes = prev.imagenes.filter(
+                            (i) => i !== img
+                          );
 
-          {form.imagenPrincipal === img && (
-            <div className="absolute bottom-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center">
-              Principal
+                          return {
+                            ...prev,
+                            imagenes: nuevasImagenes,
+                            imagenPrincipal:
+                              prev.imagenPrincipal === img
+                                ? nuevasImagenes[0] || ''
+                                : prev.imagenPrincipal
+                          };
+                        });
+                      }}
+                      className="absolute top-1 right-1 bg-red-600 hover:bg-red-700 text-white text-xs px-1 rounded"
+                      title="Eliminar imagen"
+                    >
+                      ✕
+                    </button>
+
+                    {form.imagenPrincipal === img && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-yellow-500 text-black text-xs text-center">
+                        Principal
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
 
           {/* Selector de Imágenes de Cloudinary */}
           <div>
@@ -334,8 +343,8 @@ const ObraForm = () => {
               ) : (
                 <div className="grid grid-cols-6 gap-2">
                   {cloudinaryImages.map(img => {
-                    const isSelected = form.imagenes.includes(img.public_id);
-                    const isPrincipal = form.imagenPrincipal === img.public_id;
+                    const isSelected = form.imagenes.includes(img.url);
+                    const isPrincipal = form.imagenPrincipal === img.url;
                     return (
                       <div 
                         key={img.public_id}
@@ -344,9 +353,9 @@ const ObraForm = () => {
                         }`}
                         onClick={() => {
                           if (isSelected && !isPrincipal) {
-                            setPrincipal(img.public_id);
+                            setPrincipal(img.url);
                           } else {
-                            toggleImage(img.public_id);
+                            toggleImage(img);
                           }
                         }}
                         title="Click: seleccionar | Click en seleccionada: hacer principal"
@@ -368,7 +377,7 @@ const ObraForm = () => {
               Click para seleccionar | Click en imagen seleccionada (verde) para hacerla principal (★)
             </p>
             <p className="text-sm text-gray-400">
-              Seleccionadas: {form.imagenes.length} | Principal: {form.imagenPrincipal || 'ninguna'}
+              Seleccionadas: {form.imagenes.length} | Principal: {form.imagenPrincipal ? '✓' : 'ninguna'}
             </p>
           </div>
 
