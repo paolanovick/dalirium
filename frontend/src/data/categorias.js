@@ -87,6 +87,6 @@ export const getCategoriaByPath = (path) =>
   categorias.find((cat) => cat.path === path);
 
 // WhatsApp
-export const WHATSAPP_NUMBER = "37668355";
+export const WHATSAPP_NUMBER = "34687789792";
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
