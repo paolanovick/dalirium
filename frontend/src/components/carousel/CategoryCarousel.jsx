@@ -143,7 +143,10 @@ const CategoryCarousel = ({
             >
               <div className="relative">
                 <img
-                  src={obra.imagenPrincipal}
+                 src={obra.imagenPrincipal.includes('/upload/') 
+  ? obra.imagenPrincipal.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
+  : obra.imagenPrincipal
+}
                   alt={obra.titulo}
                   draggable={false}
                   className="w-[250px] md:w-[320px] h-auto max-h-[350px] md:max-h-[420px] object-contain rounded-lg shadow-2xl transition-all duration-700"
