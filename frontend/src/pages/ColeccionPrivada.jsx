@@ -111,7 +111,7 @@ const ColeccionPrivada = () => {
             </p>
 
             <a
-             href="https://wa.me/34687789792?text=Hola,%20me%20gustaría%20acceder%20a%20la%20colección%20privada" target="_blank"
+             href="https://wa.me/34687789792?text=Hola!%20Quisiera%20ingresar%20a%20la%20colección%20privada.%20¿Me%20darían%20el%20código?" target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg mb-8 transition-colors"
             >

@@ -133,7 +133,7 @@ const Footer = () => {
 
       {/* Botón flotante de WhatsApp */}
       <a
-         href="https://wa.me/34687789792"
+        href="https://wa.me/34687789792?text=Hola!%20Quisiera%20información%20sobre%20las%20obras%20de%20Dalirium."
   target="_blank"
   rel="noopener noreferrer"
   className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300 group"
