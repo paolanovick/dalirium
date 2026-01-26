@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Iconos simples
 const ChevronLeft = ({ size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M15 18l-6-6 6-6" />
@@ -59,22 +58,28 @@ const CategoryCarousel = ({
     const diff = index - activeIndex;
     const normalizedDiff = ((diff + total) % total);
     
+    // Centro
     if (normalizedDiff === 0) {
-      return { transform: 'translateX(-50%) scale(1)', left: '50%', zIndex: 5, opacity: 1, filter: 'grayscale(0)' };
+      return { transform: 'translateX(-50%) scale(1)', zIndex: 5, opacity: 1, filter: 'grayscale(0)' };
     }
+    // Derecha (siguiente)
     if (normalizedDiff === 1) {
-      return { transform: 'translateX(20%) scale(0.7)', left: '50%', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
+      return { transform: 'translateX(30%) scale(0.7)', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
     }
+    // Izquierda (anterior)
     if (normalizedDiff === total - 1) {
-      return { transform: 'translateX(-120%) scale(0.7)', left: '50%', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
+      return { transform: 'translateX(-130%) scale(0.7)', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
     }
+    // Segunda derecha
     if (normalizedDiff === 2) {
-      return { transform: 'translateX(70%) scale(0.5)', left: '50%', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
+      return { transform: 'translateX(100%) scale(0.5)', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
     }
+    // Segunda izquierda
     if (normalizedDiff === total - 2) {
-      return { transform: 'translateX(-170%) scale(0.5)', left: '50%', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
+      return { transform: 'translateX(-200%) scale(0.5)', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
     }
-    return { transform: 'translateX(-50%) scale(0.3)', left: '50%', zIndex: 1, opacity: 0, filter: 'grayscale(1)' };
+    // Ocultos
+    return { transform: 'translateX(-50%) scale(0.3)', zIndex: 1, opacity: 0, filter: 'grayscale(1)' };
   };
 
   const handleStart = (clientX) => {
@@ -94,7 +99,6 @@ const CategoryCarousel = ({
     startAutoplay();
   };
 
-  // Return null DESPUÉS de los hooks
   if (!obras.length) return null;
 
   return (
@@ -129,10 +133,9 @@ const CategoryCarousel = ({
           return (
             <div
               key={obra.id}
-              className="absolute top-1/2 -translate-y-1/2 transition-all duration-700 ease-out cursor-pointer"
+              className="absolute top-1/2 left-1/2 -translate-y-1/2 transition-all duration-700 ease-out cursor-pointer"
               style={{
-                left: style.left,
-                transform: `translateY(-50%) ${style.transform.replace('translateX(-50%) ', '')}`,
+                transform: `translateY(-50%) ${style.transform}`,
                 zIndex: style.zIndex,
                 opacity: style.opacity,
               }}
