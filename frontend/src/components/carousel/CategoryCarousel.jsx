@@ -43,7 +43,7 @@ const CategoryCarousel = ({
         </div>
       )}
 
-      <div className="relative z-10 pb-8">
+      <div className="relative z-10 pb-8 px-6 md:px-12">
         <Swiper
   modules={[Navigation, EffectCoverflow]}
   effect={items.length > 3 ? "coverflow" : "slide"}
