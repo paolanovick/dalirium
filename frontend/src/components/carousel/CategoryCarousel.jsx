@@ -24,7 +24,7 @@ const CategoryCarousel = ({
     : obras.map(obra => ({ ...obra, imagen: obra.imagenPrincipal, key: obra.id }));
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden">
+    <section className="relative py-16 md:py-24 overflow-x-clip">
       {/* Fondo con degradado cálido */}
       <div className="absolute inset-0 bg-gradient-to-b from-stone-950 via-amber-950/20 to-stone-950 opacity-50" />
       
@@ -43,7 +43,7 @@ const CategoryCarousel = ({
         </div>
       )}
 
-      <div className="relative z-10 pb-8 px-6 md:px-12">
+      <div className="relative z-10 pb-8 ">
         <Swiper
   modules={[Navigation, EffectCoverflow]}
   effect={items.length > 3 ? "coverflow" : "slide"}
