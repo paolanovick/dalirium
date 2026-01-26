@@ -92,8 +92,7 @@ const CategoryCarousel = ({
                   }`} />
                   
                   {/* Contenedor de imagen */}
-                  <div className="relative aspect-[3/4] w-[240px] md:w-[280px] lg:w-[320px] bg-stone-900 overflow-hidden">
-                    {/* Borde interior dorado */}
+                 <div className="relative aspect-square w-[240px] md:w-[280px] lg:w-[320px] bg-stone-900 overflow-hidden">  {/* Borde interior dorado */}
                     <div className="absolute inset-0 border border-amber-500/30 z-10 pointer-events-none" />
                     
                     <img
