@@ -28,6 +28,7 @@ const TopNav = () => {
   }, []);
 
   return (
+    <>
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         scrolled
@@ -147,84 +148,53 @@ const TopNav = () => {
         </button>
       </div>
 
+    </header>
+
       {/* OVERLAY */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          className="fixed inset-0 bg-black/50 lg:hidden"
+          style={{ zIndex: 55 }}
           onClick={() => setMenuOpen(false)}
         />
       )}
 
       {/* MENÚ MÓVIL - slide desde la derecha */}
       <div
-        className="fixed top-0 right-0 h-full w-72 z-40 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto transition-transform duration-300 ease-in-out"
-        style={{ transform: menuOpen ? 'translateX(0)' : 'translateX(100%)' }}
+        className="fixed top-0 right-0 h-full w-72 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto transition-transform duration-300 ease-in-out"
+        style={{ zIndex: 60, transform: menuOpen ? 'translateX(0)' : 'translateX(100%)' }}
       >
-          <button
-            className="absolute top-6 right-6 text-white/70 hover:text-white text-3xl transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            ✕
-          </button>
+        <button
+          className="absolute top-6 right-6 text-white/70 hover:text-white text-3xl transition-colors"
+          onClick={() => setMenuOpen(false)}
+        >
+          ✕
+        </button>
 
-          <div className="flex flex-col items-start justify-start pt-20 pb-12 px-8 gap-4 min-h-screen">
-            <NavLink
-              to="/"
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `text-lg uppercase tracking-widest transition-colors ${
-                  isActive ? "text-white" : "text-white/60"
-                }`
-              }
-            >
-              Inicio
+        <div className="flex flex-col items-start pt-20 pb-12 px-8 gap-5">
+          <NavLink to="/" onClick={() => setMenuOpen(false)}
+            className={({ isActive }) => `text-lg uppercase tracking-widest transition-colors ${isActive ? "text-white" : "text-white/60"}`}>
+            Inicio
+          </NavLink>
+          <NavLink to="/colecciones" onClick={() => setMenuOpen(false)}
+            className={({ isActive }) => `text-lg uppercase tracking-widest transition-colors ${isActive ? "text-amber-400" : "text-amber-400/60"}`}>
+            Todas las colecciones
+          </NavLink>
+          <div className="w-32 h-px bg-white/20" />
+          {categorias.map((cat) => (
+            <NavLink key={cat.id} to={cat.path} onClick={() => setMenuOpen(false)}
+              className={({ isActive }) => `text-sm uppercase tracking-widest transition-colors ${isActive ? "text-white" : "text-white/50"}`}>
+              {cat.nombre}
             </NavLink>
-
-            <NavLink
-              to="/colecciones"
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `text-lg uppercase tracking-widest transition-colors ${
-                  isActive ? "text-amber-400" : "text-amber-400/60"
-                }`
-              }
-            >
-              Todas las colecciones
-            </NavLink>
-
-            <div className="w-32 h-px bg-white/20 my-4" />
-
-            {categorias.map((cat) => (
-              <NavLink
-                key={cat.id}
-                to={cat.path}
-                onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `text-sm uppercase tracking-widest transition-colors ${
-                    isActive ? "text-white" : "text-white/50"
-                  }`
-                }
-              >
-                {cat.nombre}
-              </NavLink>
-            ))}
-
-            <div className="w-32 h-px bg-white/20 my-4" />
-
-            <NavLink
-              to="/coleccion-privada"
-              onClick={() => setMenuOpen(false)}
-              className={({ isActive }) =>
-                `text-lg uppercase tracking-widest transition-colors ${
-                  isActive ? "text-amber-400" : "text-amber-400/60"
-                }`
-              }
-            >
-              🔒 Colección Privada
-            </NavLink>
-          </div>
+          ))}
+          <div className="w-32 h-px bg-white/20" />
+          <NavLink to="/coleccion-privada" onClick={() => setMenuOpen(false)}
+            className={({ isActive }) => `text-lg uppercase tracking-widest transition-colors ${isActive ? "text-amber-400" : "text-amber-400/60"}`}>
+            🔒 Colección Privada
+          </NavLink>
         </div>
-    </header>
+      </div>
+    </>
   );
 };
 
