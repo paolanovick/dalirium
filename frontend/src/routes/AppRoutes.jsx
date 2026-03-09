@@ -6,6 +6,7 @@ import ObraDetalle from "../pages/ObraDetalle";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ObraForm from "../pages/admin/ObraForm";
 import ColeccionPrivada from "../pages/ColeccionPrivada";
+import AdminGuard from "../components/admin/AdminGuard";
 
 
 const AppRoutes = () => {
@@ -16,12 +17,12 @@ const AppRoutes = () => {
       <Route path="/categoria/:categoriaId" element={<CategoriaDetalle />} />
       <Route path="/obra/:slug" element={<ObraDetalle />} />
       <Route path="/coleccion-privada" element={<ColeccionPrivada />} />
-      
+
       {/* Admin */}
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/nueva" element={<ObraForm />} />
-      <Route path="/admin/editar/:id" element={<ObraForm />} />
-      
+      <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+      <Route path="/admin/nueva" element={<AdminGuard><ObraForm /></AdminGuard>} />
+      <Route path="/admin/editar/:id" element={<AdminGuard><ObraForm /></AdminGuard>} />
+
       <Route path="*" element={<Home />} />
     </Routes>
   );
