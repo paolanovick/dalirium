@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import { getCategoriaById, getCategoriaByPath } from "../data/categorias";
 import { getObrasByCategoria } from "../data/obras";
+import ArtLoader from "../components/ArtLoader";
 
 const CategoriaDetalle = () => {
   const { categoriaId } = useParams();
@@ -107,14 +108,7 @@ const CategoriaDetalle = () => {
       <section className="px-4 pb-20">
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="grid grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-[3/4] bg-zinc-800 animate-pulse"
-                />
-              ))}
-            </div>
+            <ArtLoader text="Cargando colección..." />
           ) : (
             <div className="grid grid-cols-4 gap-6">
               {obras.map((obra) => (
