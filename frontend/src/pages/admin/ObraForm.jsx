@@ -4,9 +4,8 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CATEGORIAS = [
-  'relojes', 'litografias', 'cuadros', 'cuadros-chicos', 
-  'esculturas', 'medallas-olimpicas', 'juegos-olimpicos', 
-  'vajilla', 'fotos-textos', 'daga', 'certificados', 'coleccion-privada'
+  'cuadros', 'medallas-olimpicas', 'litografias',
+  'cuadros-chicos', 'vajilla', 'fotos-textos', 'coleccion-privada'
 ];
 
 const ObraForm = () => {

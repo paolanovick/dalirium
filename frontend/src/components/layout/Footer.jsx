@@ -9,7 +9,7 @@ const Footer = () => {
         <img 
           src="/Dalirium_logo_2024_negate.png"
           alt=""
-          className="w-auto max-h-[250px] sm:max-h-[300px] md:max-h-[400px] opacity-20 object-contain"
+          className="w-full max-h-[250px] sm:max-h-[300px] md:max-h-[400px] opacity-20 object-contain"
         />
       </div>
 
@@ -25,7 +25,7 @@ const Footer = () => {
                 <img 
                   src="/logoFN.png" 
                   alt="Dalirium Art Gallery" 
-                  className="max-h-40 w-auto object-contain"
+                  className="max-h-40 w-auto max-w-full object-contain"
                 />
               </div>
               

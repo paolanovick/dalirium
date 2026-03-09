@@ -4,27 +4,61 @@ import { Link } from 'react-router-dom';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const CATEGORIAS = [
   'cuadros',
-  'cuadros-chicos',
-  'esculturas',
-  'relojes',
-   'medallas-olimpicas',
-   'juegos-olimpicos',
+  'medallas-olimpicas',
   'litografias',
-  'vajilla',  
+  'cuadros-chicos',
+  'vajilla',
   'fotos-textos',
-  'daga',
-  'certificados',
   'coleccion-privada'
 ];
 
 const AdminDashboard = () => {
   const [obras, setObras] = useState([]);
   const [loading, setLoading] = useState(true);
-const [categoriaActiva, setCategoriaActiva] = useState('relojes');
+  const [categoriaActiva, setCategoriaActiva] = useState('cuadros');
+  const [codigoActual, setCodigoActual] = useState('');
+  const [nuevoCodigo, setNuevoCodigo] = useState('');
+  const [savingCodigo, setSavingCodigo] = useState(false);
+  const [mensajeCodigo, setMensajeCodigo] = useState('');
 
   useEffect(() => {
     fetchObras();
+    fetchCodigo();
   }, []);
+
+  const fetchCodigo = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/accesos/config`);
+      const data = await res.json();
+      setCodigoActual(data.codigoAcceso);
+    } catch (error) {
+      console.error('Error al cargar código:', error);
+    }
+  };
+
+  const handleCambiarCodigo = async (e) => {
+    e.preventDefault();
+    if (!nuevoCodigo.trim()) return;
+    setSavingCodigo(true);
+    setMensajeCodigo('');
+    try {
+      const res = await fetch(`${API_URL}/api/accesos/config`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigoAcceso: nuevoCodigo.toUpperCase() })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setCodigoActual(data.codigoAcceso);
+      setNuevoCodigo('');
+      setMensajeCodigo('✅ Código actualizado correctamente');
+      setTimeout(() => setMensajeCodigo(''), 3000);
+    } catch (error) {
+      setMensajeCodigo('❌ ' + error.message);
+    } finally {
+      setSavingCodigo(false);
+    }
+  };
 
   const fetchObras = async () => {
     try {
@@ -154,6 +188,38 @@ if (loading) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* CÓDIGO DE ACCESO COLECCIÓN PRIVADA */}
+        <div className="mt-10 bg-gray-800 rounded-lg p-6">
+          <h2 className="text-xl font-bold mb-1">🔒 Código de acceso — Colección Privada</h2>
+          <p className="text-gray-400 text-sm mb-4">
+            Código actual: <span className="text-amber-400 font-mono font-bold">{codigoActual || '...'}</span>
+          </p>
+          <form onSubmit={handleCambiarCodigo} className="flex gap-3 items-end">
+            <div>
+              <label className="block text-sm text-gray-400 mb-1">Nuevo código</label>
+              <input
+                type="text"
+                value={nuevoCodigo}
+                onChange={(e) => setNuevoCodigo(e.target.value.toUpperCase())}
+                placeholder="Ej: DALI2026"
+                minLength={4}
+                required
+                className="p-2 bg-gray-700 border border-gray-600 rounded text-white font-mono uppercase focus:border-amber-500 outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={savingCodigo}
+              className="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 px-4 py-2 rounded font-bold"
+            >
+              {savingCodigo ? 'Guardando...' : 'Cambiar código'}
+            </button>
+          </form>
+          {mensajeCodigo && (
+            <p className="mt-3 text-sm">{mensajeCodigo}</p>
+          )}
         </div>
 
         <div className="mt-4">
