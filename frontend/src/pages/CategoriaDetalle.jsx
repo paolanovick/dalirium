@@ -27,21 +27,19 @@ const CategoriaDetalle = () => {
 
     let cancelled = false;
 
-    // 👇 mover setLoading a microtask (ESLint OK)
-    Promise.resolve().then(() => {
-      if (!cancelled) setLoading(true);
-    });
+    const load = async () => {
+      setLoading(true);
+      const [data] = await Promise.all([
+        getObrasByCategoria(categoria.id).catch(() => []),
+        new Promise(resolve => setTimeout(resolve, 800))
+      ]);
+      if (!cancelled) {
+        setTodasLasObras(data);
+        setLoading(false);
+      }
+    };
 
-    getObrasByCategoria(categoria.id)
-      .then((data) => {
-        if (!cancelled) setTodasLasObras(data);
-      })
-      .catch(() => {
-        if (!cancelled) setTodasLasObras([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    load();
 
     return () => {
       cancelled = true;
