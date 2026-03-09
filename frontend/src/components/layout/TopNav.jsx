@@ -156,7 +156,10 @@ const TopNav = () => {
       )}
 
       {/* MENÚ MÓVIL - slide desde la derecha */}
-      <div className={`fixed top-0 right-0 h-full w-72 z-40 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div
+        className="fixed top-0 right-0 h-full w-72 z-40 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto transition-transform duration-300 ease-in-out"
+        style={{ transform: menuOpen ? 'translateX(0)' : 'translateX(100%)' }}
+      >
           <button
             className="absolute top-6 right-6 text-white/70 hover:text-white text-3xl transition-colors"
             onClick={() => setMenuOpen(false)}
