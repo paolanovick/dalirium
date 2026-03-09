@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import CategoryCarousel from "./CategoryCarousel";
 import { getObrasByCategoria } from "../../data/obras";
+import ArtLoader from "../ArtLoader";
 
 const LazyCarousel = ({ categoria }) => {
   const [obras, setObras] = useState([]);
@@ -55,7 +56,7 @@ const LazyCarousel = ({ categoria }) => {
             <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent mx-auto" />
           </div>
           <div className="flex justify-center">
-            <div className="w-12 h-12 border-2 border-white/20 border-t-amber-500 rounded-full animate-spin"></div>
+            <ArtLoader />
           </div>
         </div>
       ) : obras.length > 0 ? (
