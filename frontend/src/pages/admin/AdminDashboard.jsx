@@ -93,14 +93,43 @@ if (loading) {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
           <h1 className="text-3xl font-bold">🎨 Admin Dalirium</h1>
-          <Link 
-            to="/admin/nueva" 
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
-          >
-            + Nueva Obra
-          </Link>
+          <div className="flex flex-wrap items-end gap-4">
+            {/* Código de acceso colección privada */}
+            <div className="bg-gray-800 rounded-lg px-4 py-3 flex flex-wrap items-end gap-3">
+              <div>
+                <p className="text-xs text-gray-400 mb-1">
+                  Código privada: <span className="text-amber-400 font-mono font-bold">{codigoActual || '...'}</span>
+                </p>
+                <form onSubmit={handleCambiarCodigo} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={nuevoCodigo}
+                    onChange={(e) => setNuevoCodigo(e.target.value.toUpperCase())}
+                    placeholder="Nuevo código"
+                    minLength={4}
+                    required
+                    className="p-2 bg-gray-700 border border-gray-600 rounded text-white font-mono uppercase text-sm focus:border-amber-500 outline-none w-36"
+                  />
+                  <button
+                    type="submit"
+                    disabled={savingCodigo}
+                    className="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 px-3 py-2 rounded text-sm font-bold"
+                  >
+                    {savingCodigo ? '...' : 'Cambiar'}
+                  </button>
+                </form>
+                {mensajeCodigo && <p className="text-xs mt-1">{mensajeCodigo}</p>}
+              </div>
+            </div>
+            <Link
+              to="/admin/nueva"
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+            >
+              + Nueva Obra
+            </Link>
+          </div>
         </div>
 <div className="flex flex-wrap gap-2 mb-6">
   {CATEGORIAS.map(cat => (
@@ -188,38 +217,6 @@ if (loading) {
               )}
             </tbody>
           </table>
-        </div>
-
-        {/* CÓDIGO DE ACCESO COLECCIÓN PRIVADA */}
-        <div className="mt-10 bg-gray-800 rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-1">🔒 Código de acceso — Colección Privada</h2>
-          <p className="text-gray-400 text-sm mb-4">
-            Código actual: <span className="text-amber-400 font-mono font-bold">{codigoActual || '...'}</span>
-          </p>
-          <form onSubmit={handleCambiarCodigo} className="flex gap-3 items-end">
-            <div>
-              <label className="block text-sm text-gray-400 mb-1">Nuevo código</label>
-              <input
-                type="text"
-                value={nuevoCodigo}
-                onChange={(e) => setNuevoCodigo(e.target.value.toUpperCase())}
-                placeholder="Ej: DALI2026"
-                minLength={4}
-                required
-                className="p-2 bg-gray-700 border border-gray-600 rounded text-white font-mono uppercase focus:border-amber-500 outline-none"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={savingCodigo}
-              className="bg-amber-600 hover:bg-amber-700 disabled:bg-gray-600 px-4 py-2 rounded font-bold"
-            >
-              {savingCodigo ? 'Guardando...' : 'Cambiar código'}
-            </button>
-          </form>
-          {mensajeCodigo && (
-            <p className="mt-3 text-sm">{mensajeCodigo}</p>
-          )}
         </div>
 
         <div className="mt-4">
