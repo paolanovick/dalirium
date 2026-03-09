@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import MainLayout from "../components/layout/MainLayout";
 import { getObraBySlug, getObrasByCategoria } from "../data/obras";
 import { getCategoriaById, WHATSAPP_NUMBER } from "../data/categorias";
+import ArtLoader from "../components/ArtLoader";
 
 const ObraDetalle = () => {
   const { slug } = useParams();
@@ -53,10 +54,7 @@ const ObraDetalle = () => {
     return (
       <MainLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-white/50">Cargando obra...</p>
-          </div>
+          <ArtLoader text="Cargando obra..." />
         </div>
       </MainLayout>
     );

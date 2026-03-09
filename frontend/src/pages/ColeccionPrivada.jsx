@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import { getObrasByCategoria } from '../data/obras';
+import ArtLoader from '../components/ArtLoader';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.agenciatripnow.site/dalirium';
 
@@ -194,7 +195,7 @@ const ColeccionPrivada = () => {
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+              <ArtLoader />
             </div>
           ) : obras.length === 0 ? (
             <p className="text-white/50 text-center py-20">
