@@ -9,27 +9,28 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Animación de carrusel infinito
     if (!carouselRef.current) return;
 
     let scrollPos = 0;
     const speed = 0.5;
+    let rafId;
 
     const animateCarousel = () => {
       scrollPos -= speed;
 
       if (carouselRef.current) {
-        carouselRef.current.style.transform = `translateX(${scrollPos}px)`;
-
-        if (Math.abs(scrollPos) >= carouselRef.current.scrollWidth / 2) {
-          scrollPos = 0;
+        const half = carouselRef.current.scrollWidth / 2;
+        if (Math.abs(scrollPos) >= half) {
+          scrollPos = scrollPos + half;
         }
+        carouselRef.current.style.transform = `translateX(${scrollPos}px)`;
       }
 
-      requestAnimationFrame(animateCarousel);
+      rafId = requestAnimationFrame(animateCarousel);
     };
 
-    animateCarousel();
+    rafId = requestAnimationFrame(animateCarousel);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   const handleIngresar = () => {
