@@ -147,9 +147,16 @@ const TopNav = () => {
         </button>
       </div>
 
-      {/* MENÚ MÓVIL */}
+      {/* OVERLAY */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto">
+        <div
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* MENÚ MÓVIL - slide desde la derecha */}
+      <div className={`fixed top-0 right-0 h-full w-72 z-40 bg-black/95 backdrop-blur-xl lg:hidden overflow-y-auto transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <button
             className="absolute top-6 right-6 text-white/70 hover:text-white text-3xl transition-colors"
             onClick={() => setMenuOpen(false)}
@@ -157,7 +164,7 @@ const TopNav = () => {
             ✕
           </button>
 
-          <div className="flex flex-col items-center justify-start pt-24 pb-12 gap-4 min-h-screen">
+          <div className="flex flex-col items-start justify-start pt-20 pb-12 px-8 gap-4 min-h-screen">
             <NavLink
               to="/"
               onClick={() => setMenuOpen(false)}
@@ -214,7 +221,6 @@ const TopNav = () => {
             </NavLink>
           </div>
         </div>
-      )}
     </header>
   );
 };
