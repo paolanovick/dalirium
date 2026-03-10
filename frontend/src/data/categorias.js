@@ -4,12 +4,6 @@
 
 export const categorias = [
   {
-    id: "cuadros",
-    nombre: "Cuadros",
-    descripcion: "Pinturas y obras enmarcadas",
-    path: "/categoria/cuadros"
-  },
-  {
     id: "medallas-olimpicas",
     nombre: "Medallas Olímpicas",
     descripcion: "Medallas y piezas conmemorativas",
@@ -38,6 +32,12 @@ export const categorias = [
     nombre: "Fotos y textos",
     descripcion: "Material gráfico, textos y fotografías",
     path: "/categoria/fotos-textos"
+  },
+  {
+    id: "cuadros",
+    nombre: "Obras en Reserva",
+    descripcion: "Pinturas y obras enmarcadas",
+    path: "/categoria/cuadros"
   }
 ];
 
