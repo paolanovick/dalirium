@@ -4,28 +4,16 @@
 
 export const categorias = [
   {
-    id: "medallas-olimpicas",
-    nombre: "Medallas Olímpicas",
-    descripcion: "Medallas y piezas conmemorativas",
-    path: "/categoria/medallas-olimpicas"
+    id: "botellas",
+    nombre: "Botellas",
+    descripcion: "Botellas y piezas únicas",
+    path: "/categoria/botellas"
   },
   {
-    id: "litografias",
-    nombre: "Litografías",
-    descripcion: "Obra gráfica y litografías originales",
-    path: "/categoria/litografias"
-  },
-  {
-    id: "cuadros-chicos",
-    nombre: "Cuadros pequeños",
-    descripcion: "Formatos pequeños y piezas íntimas",
-    path: "/categoria/cuadros-chicos"
-  },
-  {
-    id: "vajilla",
-    nombre: "Vajilla",
-    descripcion: "Objetos utilitarios y piezas de diseño",
-    path: "/categoria/vajilla"
+    id: "gala-dali-dorado",
+    nombre: "Gala Dalí Dorado",
+    descripcion: "Colección Gala Dalí Dorado",
+    path: "/categoria/gala-dali-dorado"
   },
   {
     id: "fotos-textos",
@@ -34,10 +22,40 @@ export const categorias = [
     path: "/categoria/fotos-textos"
   },
   {
-    id: "cuadros",
-    nombre: "Obras en Reserva",
-    descripcion: "Pinturas y obras enmarcadas",
-    path: "/categoria/cuadros"
+    id: "litografias",
+    nombre: "Litografías",
+    descripcion: "Obra gráfica y litografías originales",
+    path: "/categoria/litografias"
+  },
+  {
+    id: "medallas-olimpicas",
+    nombre: "Medallas Olímpicas",
+    descripcion: "Medallas y piezas conmemorativas",
+    path: "/categoria/medallas-olimpicas"
+  },
+  {
+    id: "vajilla",
+    nombre: "Vajilla",
+    descripcion: "Objetos utilitarios y piezas de diseño",
+    path: "/categoria/vajilla"
+  },
+  {
+    id: "esculturas",
+    nombre: "Esculturas",
+    descripcion: "Esculturas y piezas tridimensionales",
+    path: "/categoria/esculturas"
+  },
+  {
+    id: "gala-lincoln",
+    nombre: "Gala Lincoln",
+    descripcion: "Colección Gala Lincoln",
+    path: "/categoria/gala-lincoln"
+  },
+  {
+    id: "muro-de-los-lamentos",
+    nombre: "Muro de los Lamentos",
+    descripcion: "Colección Muro de los Lamentos",
+    path: "/categoria/muro-de-los-lamentos"
   }
 ];
 
