@@ -197,6 +197,7 @@ const AdminDashboard = () => {
               className="p-2 bg-gray-800 border border-gray-600 rounded text-white text-sm outline-none"
             >
               <option value="categoria">Cambiar categoría</option>
+              <option value="titulo">Cambiar título</option>
               <option value="precio">Cambiar precio</option>
               <option value="destacada">Cambiar destacada</option>
             </select>
@@ -209,6 +210,15 @@ const AdminDashboard = () => {
                 <option value="">-- Elegir --</option>
                 {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
+            )}
+            {bulkField === 'titulo' && (
+              <input
+                type="text"
+                value={bulkValue}
+                onChange={e => setBulkValue(e.target.value)}
+                placeholder="Nuevo título"
+                className="p-2 bg-gray-800 border border-gray-600 rounded text-white text-sm outline-none w-48"
+              />
             )}
             {bulkField === 'precio' && (
               <input
