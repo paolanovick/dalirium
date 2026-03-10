@@ -29,7 +29,7 @@ export const categorias = [
   },
   {
     id: "fotos-textos",
-    nombre: "Fotos y textos",
+    nombre: "Libros",
     descripcion: "Material gráfico, textos y fotografías",
     path: "/categoria/fotos-textos"
   },
