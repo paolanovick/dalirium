@@ -59,22 +59,23 @@ exports.createObra = async (req, res, next) => {
   try {
     const { slug, titulo, categoria, subcategoria, imagenPrincipal, imagenes } = req.body;
     
-    if (!slug || !titulo || !categoria || !subcategoria || !imagenPrincipal) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' });
+    if (!categoria) {
+      return res.status(400).json({ error: 'La categoría es requerida' });
     }
-    
-    const obraExistente = await Obra.findOne({ slug });
+
+    const slugFinal = slug || `obra-${Date.now()}`;
+    const obraExistente = await Obra.findOne({ slug: slugFinal });
     if (obraExistente) {
       return res.status(400).json({ error: 'El slug ya existe' });
     }
-    
+
     const obra = new Obra({
-      slug,
-      titulo,
+      slug: slugFinal,
+      titulo: titulo || 'Sin título',
       categoria,
-      subcategoria,
-      imagenPrincipal,
-      imagenes: imagenes || [imagenPrincipal]
+      subcategoria: subcategoria || categoria,
+      imagenPrincipal: imagenPrincipal || '',
+      imagenes: imagenes || (imagenPrincipal ? [imagenPrincipal] : [])
     });
     
     await obra.save();

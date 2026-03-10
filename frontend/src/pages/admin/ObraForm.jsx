@@ -25,7 +25,7 @@ const ObraForm = () => {
     titulo: '',
     slug: '',
     categoria: 'botellas',
-    subcategoria: '',
+    subcategoria: 'botellas',
     imagenPrincipal: '',
     imagenes: [],
     orden: 999,
@@ -220,7 +220,6 @@ const ObraForm = () => {
                 name="titulo"
                 value={form.titulo}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:border-blue-500 outline-none"
               />
             </div>
@@ -231,7 +230,6 @@ const ObraForm = () => {
                 name="slug"
                 value={form.slug}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:border-blue-500 outline-none"
               />
             </div>
@@ -245,7 +243,6 @@ const ObraForm = () => {
                 name="categoria"
                 value={form.categoria}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:border-blue-500 outline-none"
               >
                 {CATEGORIAS.map(cat => (
@@ -461,7 +458,7 @@ const ObraForm = () => {
           <div className="flex gap-4">
             <button
               type="submit"
-              disabled={saving || !form.imagenPrincipal}
+              disabled={saving}
               className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-6 py-3 rounded font-bold"
             >
               {saving ? 'Guardando...' : isEditing ? 'Actualizar' : 'Crear Obra'}
