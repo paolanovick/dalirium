@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { getObrasByCategoria } from '../data/obras';
 import ArtLoader from '../components/ArtLoader';
@@ -204,7 +205,7 @@ const ColeccionPrivada = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {obras.map(obra => (
-                <div key={obra.id} className="bg-gray-800 rounded-lg overflow-hidden">
+                <Link key={obra.id} to={`/obra/${obra.slug}`} className="bg-gray-800 rounded-lg overflow-hidden block hover:opacity-90 transition-opacity">
                   <img
                     src={obra.imagenPrincipal}
                     alt={obra.titulo}
@@ -214,7 +215,7 @@ const ColeccionPrivada = () => {
                     <h3 className="text-white text-lg font-semibold">{obra.titulo}</h3>
                     <p className="text-amber-500">{obra.precio}</p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
