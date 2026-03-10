@@ -9,20 +9,20 @@ const obraSchema = new mongoose.Schema({
   },
   titulo: {
     type: String,
-    required: true
+    default: 'Sin título'
   },
   categoria: {
     type: String,
     required: true,
-    enum: ['relojes', 'litografias', 'cuadros', 'cuadros-chicos', 'esculturas', 'medallas-olimpicas', 'juegos-olimpicos', 'vajilla', 'fotos-textos', 'daga', 'certificados', 'coleccion-privada']
+    enum: ['botellas', 'gala-dali-dorado', 'fotos-textos', 'litografias', 'medallas-olimpicas', 'vajilla', 'esculturas', 'gala-lincoln', 'muro-de-los-lamentos', 'coleccion-privada']
   },
   subcategoria: {
     type: String,
-    required: true
+    default: ''
   },
   imagenPrincipal: {
     type: String,
-    required: true
+    default: ''
   },
   imagenes: [{
     type: String
