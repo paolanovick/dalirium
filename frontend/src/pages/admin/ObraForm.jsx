@@ -197,10 +197,9 @@ const ObraForm = () => {
 
   // Helper para obtener thumbnail de una URL
   const getThumbnail = (imgUrl) => {
-    if (imgUrl.startsWith('http')) {
-      return imgUrl.replace('/upload/', '/upload/w_150,h_150,c_fill/');
-    }
-    return `https://res.cloudinary.com/dwz6kggqe/image/upload/w_150,h_150,c_fill/${imgUrl}`;
+    if (!imgUrl) return '';
+    if (imgUrl.startsWith('http')) return imgUrl;
+    return `https://res.cloudinary.com/dwz6kggqe/image/upload/${imgUrl}`;
   };
 
   return (
