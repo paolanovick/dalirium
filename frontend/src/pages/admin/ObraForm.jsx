@@ -24,7 +24,7 @@ const ObraForm = () => {
   const [form, setForm] = useState({
     titulo: '',
     slug: '',
-    categoria: 'relojes',
+    categoria: 'botellas',
     subcategoria: '',
     imagenPrincipal: '',
     imagenes: [],
