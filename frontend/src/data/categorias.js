@@ -4,12 +4,6 @@
 
 export const categorias = [
   {
-    id: "botellas",
-    nombre: "Botellas",
-    descripcion: "Botellas y piezas únicas",
-    path: "/categoria/botellas"
-  },
-  {
     id: "gala-dali-dorado",
     nombre: "Gala Dalí Dorado",
     descripcion: "Colección Gala Dalí Dorado",
@@ -56,6 +50,18 @@ export const categorias = [
     nombre: "Muro de los Lamentos",
     descripcion: "Colección Muro de los Lamentos",
     path: "/categoria/muro-de-los-lamentos"
+  },
+  {
+    id: "obras-en-reserva",
+    nombre: "Obras en Reserva",
+    descripcion: "Colección de obras disponibles bajo consulta",
+    path: "/categoria/obras-en-reserva"
+  },
+  {
+    id: "botellas",
+    nombre: "Botellas",
+    descripcion: "Botellas y piezas únicas",
+    path: "/categoria/botellas"
   }
 ];
 

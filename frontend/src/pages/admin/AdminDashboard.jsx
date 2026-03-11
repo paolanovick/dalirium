@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const CATEGORIAS = [
-  'botellas',
   'gala-dali-dorado',
   'fotos-textos',
   'litografias',
@@ -12,6 +11,8 @@ const CATEGORIAS = [
   'esculturas',
   'gala-lincoln',
   'muro-de-los-lamentos',
+  'obras-en-reserva',
+  'botellas',
   'coleccion-privada'
 ];
 
