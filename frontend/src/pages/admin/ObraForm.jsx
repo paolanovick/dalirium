@@ -85,7 +85,7 @@ const ObraForm = () => {
       formData.append('upload_preset', 'dalirium_unsigned');
       formData.append('folder', `dalirium/${form.categoria}`);
 
-      const res = await fetch('https://api.cloudinary.com/v1_1/dwz6kggqe/image/upload', {
+      const res = await fetch('https://api.cloudinary.com/v1_1/dnkm8v6eb/image/upload', {
         method: 'POST',
         body: formData
       });
@@ -200,7 +200,7 @@ const ObraForm = () => {
   const getThumbnail = (imgUrl) => {
     if (!imgUrl) return '';
     if (imgUrl.startsWith('http')) return imgUrl;
-    return `https://res.cloudinary.com/dwz6kggqe/image/upload/${imgUrl}`;
+    return `https://res.cloudinary.com/dnkm8v6eb/image/upload/${imgUrl}`;
   };
 
   return (

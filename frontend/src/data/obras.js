@@ -7,7 +7,7 @@
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.agenciatripnow.site/dalirium';
 const N8N_WEBHOOK_URL = "https://n8n.triptest.com.ar/webhook/dalirium";
-const CLOUDINARY_BASE = 'https://res.cloudinary.com/dwz6kggqe/image/upload';
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/dnkm8v6eb/image/upload';
 
 // =====================================================
 // MAPEO DE CATEGORÍAS (para n8n)
