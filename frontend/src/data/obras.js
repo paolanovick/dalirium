@@ -181,10 +181,10 @@ function processObrasFromMongo(data) {
     dimensiones: obra.dimensiones || '',
     año: obra.año || '',
     precio: obra.precio || 'Consultar',
-    imagenPrincipal: obra.imagenPrincipal.startsWith('http') 
-      ? obra.imagenPrincipal 
-      : `${CLOUDINARY_BASE}/${obra.imagenPrincipal}`,
-    imagenes: (obra.imagenes || []).map(img => 
+    imagenPrincipal: obra.imagenPrincipal
+      ? (obra.imagenPrincipal.startsWith('http') ? obra.imagenPrincipal : `${CLOUDINARY_BASE}/${obra.imagenPrincipal}`)
+      : '',
+    imagenes: (obra.imagenes || []).filter(Boolean).map(img =>
       img.startsWith('http') ? img : `${CLOUDINARY_BASE}/${img}`
     ),
     destacada: obra.destacada || false,
