@@ -1,7 +1,6 @@
 .dali-disruption-section {
   position: relative;
-  min-height: 165vh;
-  margin: 3rem 0 0;
+  margin: 2rem 0 0;
   overflow: hidden;
   isolation: isolate;
   background: #030303;
@@ -86,12 +85,10 @@
 }
 
 .dali-disruption-stage {
-  position: sticky;
-  top: 0;
-  min-height: 100vh;
+  position: relative;
   width: min(100%, 1480px);
   margin: 0 auto;
-  padding: 6rem 4rem;
+  padding: 4.5rem 4rem 3.5rem;
   display: grid;
   grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
   gap: 5rem;
@@ -180,7 +177,6 @@
 
 .dali-disruption-gallery {
   position: relative;
-  min-height: 76vh;
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(230px, 0.82fr);
@@ -416,7 +412,7 @@
 
 @media (max-width: 1024px) {
   .dali-disruption-stage {
-    padding: 5rem 2rem;
+    padding: 4rem 2rem 3rem;
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
@@ -460,8 +456,7 @@
 
   .dali-disruption-stage {
     position: relative;
-    min-height: auto;
-    padding: 5rem 1rem;
+    padding: 3.5rem 1rem 2.5rem;
   }
 
   .dali-disruption-copy {

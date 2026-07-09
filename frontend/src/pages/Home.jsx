@@ -105,7 +105,7 @@ const Home = () => {
       <DaliDisruptionSection />
 
       {/* COLECCIÓN PRIVADA */}
-      <section className="py-16 md:py-24 px-4">
+      <section className="pt-8 pb-16 md:pt-10 md:pb-24 px-4">
         <div className="max-w-3xl mx-auto border border-white/10 p-8 md:p-12">
           <p className="text-white/30 text-xs uppercase tracking-widest mb-4">Acceso exclusivo</p>
           <h2 className="text-2xl md:text-3xl text-white mb-4">Colección Privada</h2>
