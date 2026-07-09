@@ -83,12 +83,12 @@ const DaliDisruptionSection = () => {
   const backdropY = useTransform(smoothProgress, [0, 1], ["-5%", "7%"]);
   const backdropScale = useTransform(smoothProgress, [0, 1], [1.08, 1.16]);
   const textY = useTransform(smoothProgress, [0, 0.55, 1], [38, 0, -24]);
-  const pieceOneY = useTransform(smoothProgress, [0, 1], ["8%", "-10%"]);
-  const pieceOneRotate = useTransform(smoothProgress, [0, 1], [-4, 3]);
-  const pieceTwoY = useTransform(smoothProgress, [0, 1], ["-10%", "12%"]);
-  const pieceTwoRotate = useTransform(smoothProgress, [0, 1], [5, -5]);
-  const pieceThreeY = useTransform(smoothProgress, [0, 1], ["12%", "-6%"]);
-  const pieceThreeRotate = useTransform(smoothProgress, [0, 1], [2, -4]);
+  const pieceOneY = useTransform(smoothProgress, [0, 1], ["3%", "-4%"]);
+  const pieceOneRotate = useTransform(smoothProgress, [0, 1], [-2, 2]);
+  const pieceTwoY = useTransform(smoothProgress, [0, 1], ["-4%", "5%"]);
+  const pieceTwoRotate = useTransform(smoothProgress, [0, 1], [2, -3]);
+  const pieceThreeY = useTransform(smoothProgress, [0, 1], ["5%", "-3%"]);
+  const pieceThreeRotate = useTransform(smoothProgress, [0, 1], [1, -2]);
 
   const pieceStyles = [
     { y: pieceOneY, rotate: pieceOneRotate },
