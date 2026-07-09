@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { clearCategoriasCache, fetchCategorias } from '../../data/categorias';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.triptest.com.ar/dalirium';
 
 const AdminDashboard = () => {
   const [obras, setObras] = useState([]);

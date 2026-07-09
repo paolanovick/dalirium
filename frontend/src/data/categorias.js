@@ -2,7 +2,7 @@
 // CATEGORIAS.JS - Dalirium
 // =====================================================
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.agenciatripnow.site/dalirium';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.triptest.com.ar/dalirium';
 
 export const DEFAULT_CATEGORIAS = [
   {

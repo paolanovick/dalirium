@@ -5,7 +5,7 @@
 // - Si la obra NO fue editada → usa n8n
 // =====================================================
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.agenciatripnow.site/dalirium';
+const API_URL = import.meta.env.VITE_API_URL || 'https://api.triptest.com.ar/dalirium';
 const N8N_WEBHOOK_URL = "https://n8n.triptest.com.ar/webhook/dalirium";
 const CLOUDINARY_BASE = 'https://res.cloudinary.com/dnkm8v6eb/image/upload';
 

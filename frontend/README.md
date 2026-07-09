@@ -5,7 +5,7 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
 ## 🌐 Sitio en Vivo
 
 - **Frontend**: https://dalirium.vercel.app
-- **Backend API**: https://api.agenciatripnow.site/dalirium
+- **Backend API**: https://api.triptest.com.ar/dalirium
 - **Admin Dashboard**: https://dalirium.vercel.app/admin
 - **GitHub**: https://github.com/paolanovick/dalirium
 
@@ -24,7 +24,7 @@ Galería de arte interactiva dedicada a Salvador Dalí con arquitectura moderna 
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
 │                      NGINX (Reverse Proxy)                      │
-│              api.agenciatripnow.site - SSL/HTTPS               │
+│              api.triptest.com.ar - SSL/HTTPS                   │
 └────────────────────────────┬────────────────────────────────────┘
                              │
 ┌────────────────────────────▼────────────────────────────────────┐
@@ -166,7 +166,7 @@ Servidor en `http://localhost:3001`
 
 ### Frontend (Vercel - Environment Variables)
 ```
-VITE_API_URL=https://api.agenciatripnow.site/dalirium
+VITE_API_URL=https://api.triptest.com.ar/dalirium
 ```
 
 ### Backend (`.env`)
@@ -262,14 +262,14 @@ GET    /api/health             # Verificar estado del servidor
 ## 🔧 Configuración Nginx
 
 ```nginx
-# /etc/nginx/sites-available/api.agenciatripnow.site
+# /etc/nginx/sites-available/api.triptest.com.ar
 
 server {
     listen 443 ssl http2;
-    server_name api.agenciatripnow.site;
+    server_name api.triptest.com.ar;
     
-    ssl_certificate /etc/letsencrypt/live/api.agenciatripnow.site/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/api.agenciatripnow.site/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/api.triptest.com.ar/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.triptest.com.ar/privkey.pem;
 
     # n8n
     location / {
