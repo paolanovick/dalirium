@@ -53,7 +53,7 @@ const LazyCarousel = ({ categoria }) => {
   }, [isVisible, categoria.id, categoria.imagenes, categoria.nombre]);
 
   return (
-    <div ref={ref} className="min-h-[400px]">
+    <div ref={ref} className="min-h-[520px] md:min-h-[760px]">
       {!isVisible || loading ? (
         // Placeholder mientras carga
         <div className="py-16 md:py-24">

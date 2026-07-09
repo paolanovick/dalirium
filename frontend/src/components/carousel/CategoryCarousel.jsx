@@ -64,19 +64,19 @@ const CategoryCarousel = ({
     }
     // Derecha (siguiente)
     if (normalizedDiff === 1) {
-      return { transform: 'translateX(30%) scale(0.7)', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
+      return { transform: 'translateX(34%) scale(0.76)', zIndex: 4, opacity: 0.72, filter: 'grayscale(0.75)' };
     }
     // Izquierda (anterior)
     if (normalizedDiff === total - 1) {
-      return { transform: 'translateX(-130%) scale(0.7)', zIndex: 4, opacity: 0.7, filter: 'grayscale(0.8)' };
+      return { transform: 'translateX(-134%) scale(0.76)', zIndex: 4, opacity: 0.72, filter: 'grayscale(0.75)' };
     }
     // Segunda derecha
     if (normalizedDiff === 2) {
-      return { transform: 'translateX(100%) scale(0.5)', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
+      return { transform: 'translateX(112%) scale(0.55)', zIndex: 3, opacity: 0.38, filter: 'grayscale(1)' };
     }
     // Segunda izquierda
     if (normalizedDiff === total - 2) {
-      return { transform: 'translateX(-200%) scale(0.5)', zIndex: 3, opacity: 0.4, filter: 'grayscale(1)' };
+      return { transform: 'translateX(-212%) scale(0.55)', zIndex: 3, opacity: 0.38, filter: 'grayscale(1)' };
     }
     // Ocultos
     return { transform: 'translateX(-50%) scale(0.3)', zIndex: 1, opacity: 0, filter: 'grayscale(1)' };
@@ -118,8 +118,8 @@ const CategoryCarousel = ({
         </div>
       )}
 
-      <div 
-        className="relative h-[400px] md:h-[500px] max-w-5xl mx-auto select-none"
+      <div
+        className="relative h-[460px] md:h-[620px] lg:h-[700px] max-w-7xl mx-auto select-none"
         onMouseDown={(e) => handleStart(e.clientX)}
         onMouseUp={(e) => handleEnd(e.clientX)}
         onMouseLeave={(e) => isDragging && handleEnd(e.clientX)}
@@ -143,13 +143,13 @@ const CategoryCarousel = ({
             >
               <div className="relative">
                 <img
-                 src={obra.imagenPrincipal.includes('/upload/') 
-  ? obra.imagenPrincipal.replace('/upload/', '/upload/w_400,q_auto,f_auto/')
-  : obra.imagenPrincipal
-}
+                  src={obra.imagenPrincipal.includes('/upload/')
+                    ? obra.imagenPrincipal.replace('/upload/', '/upload/w_900,q_auto,f_auto/')
+                    : obra.imagenPrincipal
+                  }
                   alt={obra.titulo}
                   draggable={false}
-                  className="w-[250px] md:w-[320px] h-auto max-h-[350px] md:max-h-[420px] object-contain rounded-lg shadow-2xl transition-all duration-700"
+                  className="w-[min(82vw,340px)] md:w-[min(52vw,520px)] lg:w-[min(42vw,620px)] h-auto max-h-[390px] md:max-h-[560px] lg:max-h-[640px] object-contain rounded-lg shadow-2xl transition-all duration-700"
                   style={{ filter: style.filter }}
                 />
                 
