@@ -1,5 +1,6 @@
 const Categoria = require('../models/Categoria');
 const Obra = require('../models/Obra');
+const mongoose = require('mongoose');
 
 const DEFAULT_CATEGORIAS = [
   {
@@ -234,7 +235,11 @@ exports.updateCategoria = async (req, res, next) => {
 
 exports.deleteCategoria = async (req, res, next) => {
   try {
-    const categoria = await Categoria.findById(req.params.id);
+    const lookup = mongoose.Types.ObjectId.isValid(req.params.id)
+      ? { _id: req.params.id }
+      : { slug: normalizeSlug(req.params.id) };
+
+    const categoria = await Categoria.findOne(lookup);
     if (!categoria) {
       return res.status(404).json({ error: 'Categoria no encontrada' });
     }
