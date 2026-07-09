@@ -248,6 +248,124 @@
   object-fit: cover;
   opacity: 0.88;
   filter: saturate(1.12) contrast(1.04);
+  transition:
+    opacity 360ms ease,
+    filter 360ms ease;
+}
+
+.dali-disruption-piece.is-resolving .piece-video-frame video {
+  opacity: 0.28;
+  filter: blur(5px) saturate(0.78) contrast(0.92);
+}
+
+.piece-resolution {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.dali-disruption-piece.is-resolving .piece-resolution {
+  opacity: 1;
+}
+
+.piece-resolution-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.08);
+  filter: blur(9px) saturate(0.78) contrast(1.16);
+}
+
+.dali-disruption-piece.is-resolving .piece-resolution-image {
+  animation: dali-image-resolve 1.25s steps(6, end) forwards;
+}
+
+.piece-resolution-pixels {
+  position: absolute;
+  inset: -2px;
+  opacity: 0;
+  background-image:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    radial-gradient(circle at 30% 32%, rgba(255, 255, 255, 0.3), transparent 34%),
+    radial-gradient(circle at 68% 62%, rgba(212, 175, 55, 0.18), transparent 36%);
+  background-size:
+    46px 46px,
+    46px 46px,
+    100% 100%,
+    100% 100%;
+  mix-blend-mode: screen;
+}
+
+.dali-disruption-piece.is-resolving .piece-resolution-pixels {
+  animation: dali-pixels-resolve 1.25s steps(5, end) forwards;
+}
+
+@keyframes dali-image-resolve {
+  0% {
+    opacity: 0.18;
+    transform: scale(1.12);
+    filter: blur(10px) saturate(0.68) contrast(1.18);
+    clip-path: inset(18% 14% 24% 8%);
+  }
+
+  42% {
+    opacity: 0.78;
+    transform: scale(1.055);
+    filter: blur(5px) saturate(0.88) contrast(1.16);
+    clip-path: inset(8% 7% 10% 5%);
+  }
+
+  72% {
+    opacity: 0.94;
+    transform: scale(1.02);
+    filter: blur(2px) saturate(1) contrast(1.08);
+    clip-path: inset(2% 2% 3% 2%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) saturate(1.02) contrast(1.02);
+    clip-path: inset(0);
+  }
+}
+
+@keyframes dali-pixels-resolve {
+  0% {
+    opacity: 0.74;
+    background-size:
+      54px 54px,
+      54px 54px,
+      100% 100%,
+      100% 100%;
+    transform: scale(1.04);
+  }
+
+  54% {
+    opacity: 0.48;
+    background-size:
+      24px 24px,
+      24px 24px,
+      100% 100%,
+      100% 100%;
+  }
+
+  100% {
+    opacity: 0;
+    background-size:
+      8px 8px,
+      8px 8px,
+      100% 100%,
+      100% 100%;
+    transform: scale(1);
+  }
 }
 
 .piece-one {

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
@@ -21,6 +21,49 @@ const pieces = [
     poster: "/IMG_2610.JPG",
   },
 ];
+
+const RecomposeVideoPiece = ({ piece, style }) => {
+  const [isResolving, setIsResolving] = useState(false);
+
+  const handleTimeUpdate = (event) => {
+    const video = event.currentTarget;
+    const duration = video.duration;
+
+    if (!Number.isFinite(duration) || duration <= 0) {
+      return;
+    }
+
+    const resolveWindow = Math.min(1.6, duration * 0.32);
+    setIsResolving(duration - video.currentTime <= resolveWindow);
+  };
+
+  return (
+    <motion.figure
+      className={`dali-disruption-piece ${piece.className} ${isResolving ? "is-resolving" : ""}`}
+      style={style}
+    >
+      <img className="piece-source" src={piece.poster} alt="" />
+      <div className="piece-video-frame">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={piece.poster}
+          onTimeUpdate={handleTimeUpdate}
+          onSeeked={handleTimeUpdate}
+        >
+          <source src={piece.video} type="video/mp4" />
+        </video>
+        <div className="piece-resolution" aria-hidden="true">
+          <img className="piece-resolution-image" src={piece.poster} alt="" />
+          <span className="piece-resolution-pixels" />
+        </div>
+      </div>
+    </motion.figure>
+  );
+};
 
 const DaliDisruptionSection = () => {
   const sectionRef = useRef(null);
@@ -76,11 +119,11 @@ const DaliDisruptionSection = () => {
         <motion.div className="dali-disruption-copy" style={{ y: textY }}>
           <p className="dali-disruption-kicker">Colecciones</p>
           <h2 id="dali-disruption-title" className="dali-disruption-title">
-            La obra se desarma. El viaje empieza.
+            La obra se transforma. La colección aparece.
           </h2>
           <p className="dali-disruption-text">
-            Entrá a ver las colecciones y descubrí cómo cada pieza vuelve a
-            encender el delirio de Dalí.
+            Entrá a ver las colecciones: cada pieza vuelve completa y abre
+            otra puerta al delirio de Dalí.
           </p>
           <Link to="/colecciones" className="dali-disruption-link">
             Ver colecciones
@@ -89,18 +132,11 @@ const DaliDisruptionSection = () => {
 
         <div className="dali-disruption-gallery" aria-hidden="true">
           {pieces.map((piece, index) => (
-            <motion.figure
+            <RecomposeVideoPiece
               key={piece.video}
-              className={`dali-disruption-piece ${piece.className}`}
+              piece={piece}
               style={pieceStyles[index]}
-            >
-              <img className="piece-source" src={piece.poster} alt="" />
-              <div className="piece-video-frame">
-                <video autoPlay muted loop playsInline preload="metadata" poster={piece.poster}>
-                  <source src={piece.video} type="video/mp4" />
-                </video>
-              </div>
-            </motion.figure>
+            />
           ))}
         </div>
       </div>
