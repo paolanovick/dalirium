@@ -21,7 +21,7 @@
 }
 
 /* Grid Layout - 5 columns x 3 rows */
-.grid {
+.scroll-gallery-grid {
   --offset: 0;
   --container-width: 1600px;
   --gap: clamp(10px, 7.35vw, 80px);
@@ -36,19 +36,19 @@
 }
 
 @media (max-width: 600px) {
-  .grid {
+  .scroll-gallery-grid {
     grid-template-columns: repeat(3, 1fr);
     --offset: -1;
     max-width: calc(100% - 2rem);
   }
-  
-  .grid > .layer:nth-of-type(1) {
+
+  .scroll-gallery-grid > .layer:nth-of-type(1) {
     display: none;
   }
 }
 
 /* Layers using subgrid */
-.grid > .layer {
+.scroll-gallery-grid > .layer {
   display: grid;
   grid-column: 1 / -1;
   grid-row: 1 / -1;
@@ -60,35 +60,39 @@
 }
 
 /* Layer 1: Outer edges */
-.grid > .layer:nth-of-type(1) div:nth-of-type(odd) {
+.scroll-gallery-grid > .layer:nth-of-type(1) div:nth-of-type(odd) {
   grid-column: 1;
 }
 
-.grid > .layer:nth-of-type(1) div:nth-of-type(even) {
+.scroll-gallery-grid > .layer:nth-of-type(1) div:nth-of-type(even) {
   grid-column: -2;
 }
 
 /* Layer 2: Inner columns */
-.grid > .layer:nth-of-type(2) div:nth-of-type(odd) {
+.scroll-gallery-grid > .layer:nth-of-type(2) div:nth-of-type(odd) {
   grid-column: calc(2 + var(--offset));
 }
 
-.grid > .layer:nth-of-type(2) div:nth-of-type(even) {
+.scroll-gallery-grid > .layer:nth-of-type(2) div:nth-of-type(even) {
   grid-column: calc(-3 - var(--offset));
 }
 
 /* Layer 3: Center column */
-.grid > .layer:nth-of-type(3) div:first-of-type {
+.scroll-gallery-grid > .layer:nth-of-type(3) div:first-of-type {
   grid-column: calc(3 + var(--offset));
   grid-row: 1;
 }
 
-.grid > .layer:nth-of-type(3) div:last-of-type {
+.scroll-gallery-grid > .layer:nth-of-type(3) div:last-of-type {
   grid-column: calc(3 + var(--offset));
   grid-row: -1;
 }
 
-.grid img {
+.scroll-gallery-grid > .layer > div {
+  aspect-ratio: 4 / 5;
+}
+
+.scroll-gallery-grid img {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
@@ -98,9 +102,10 @@
   display: block;
 }
 
-.grid .scaler {
+.scroll-gallery-grid .scaler {
   position: relative;
   grid-area: 2 / calc(3 + var(--offset));
+  aspect-ratio: 4 / 5;
 }
 
 .scaler {

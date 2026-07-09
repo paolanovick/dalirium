@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 // eslint-disable-next-line no-unused-vars
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 import './ScrollGallery.css';
 
 const ScrollGallery = () => {
@@ -12,47 +12,54 @@ const ScrollGallery = () => {
     offset: ["start start", "end end"]
   });
 
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 70,
+    damping: 24,
+    mass: 0.25,
+    restDelta: 0.001
+  });
+
   // Transform para la imagen central
   const imageScale = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [2.5, 1]
+    smoothProgress,
+    [0, 0.75, 1],
+    [2.5, 1.08, 1]
   );
 
   // Transforms para Layer 1
   const layer1Opacity = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.4, 0.7],
     [0, 0, 1]
   );
   const layer1Scale = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.2, 0.7],
-    [0, 0, 1]
+    [0.92, 0.92, 1]
   );
 
   // Transforms para Layer 2
   const layer2Opacity = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.35, 0.75],
     [0, 0, 1]
   );
   const layer2Scale = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.15, 0.75],
-    [0, 0, 1]
+    [0.92, 0.92, 1]
   );
 
   // Transforms para Layer 3
   const layer3Opacity = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.3, 0.8],
     [0, 0, 1]
   );
   const layer3Scale = useTransform(
-    scrollYProgress,
+    smoothProgress,
     [0, 0.1, 0.8],
-    [0, 0, 1]
+    [0.92, 0.92, 1]
   );
 
   // Layer 1: Outer edges (6 images)
@@ -84,7 +91,7 @@ const ScrollGallery = () => {
   return (
     <section ref={sectionRef} className="scroll-gallery-section">
       <div className="scroll-content">
-        <div className="grid">
+        <div className="scroll-gallery-grid">
           {/* Layer 1: Outer edges */}
           <motion.div 
             className="layer"
