@@ -32,7 +32,7 @@ const Footer = () => {
               </div>
               
               <p className="text-white/40 text-xs mt-2">
-                © ConCodigoART 2025
+                © 2026 Dalirium
               </p>
             </div>
 
@@ -128,7 +128,17 @@ const Footer = () => {
 
           {/* Copyright */}
           <div className="text-center text-white/40 text-xs px-4">
-            <p>© 2025 Creado por concodigoart@gmail.com</p>
+            <p>
+              © 2026 Todos los derechos reservados. Realizado por{' '}
+              <a
+                href="https://www.concodigoart.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                conCodigART
+              </a>
+            </p>
           </div>
         </div>
       </div>
