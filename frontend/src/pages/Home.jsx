@@ -2,6 +2,7 @@ import { useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import ScrollGallery from "../components/ScrollGallery";
+import DaliDisruptionSection from "../components/home/DaliDisruptionSection";
 import { useSEO } from "../hooks/useSEO";
 
 
@@ -101,18 +102,7 @@ const Home = () => {
         </button>
       </section>
 
-      {/* SECCIÓN EDITORIAL - RESPONSIVE */}
-      <section className="py-16 md:py-32 max-w-3xl mx-auto px-4 sm:px-6">
-        <h2 className="text-xl md:text-2xl uppercase tracking-widest mb-4 md:mb-6 text-neutral-400">
-          Colección
-        </h2>
-
-        <p className="text-neutral-300 leading-relaxed text-base md:text-lg">
-          Cada pieza ha sido seleccionada por su valor artístico,
-          simbólico y narrativo. El recorrido invita a observar,
-          detenerse y descubrir nuevas capas en cada obra.
-        </p>
-      </section>
+      <DaliDisruptionSection />
 
       {/* COLECCIÓN PRIVADA */}
       <section className="py-16 md:py-24 px-4">
