@@ -475,6 +475,7 @@
     min-height: auto;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
     gap: 0.8rem;
   }
 
@@ -487,11 +488,22 @@
 
   .piece-one {
     grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: stretch;
     aspect-ratio: 4 / 3;
   }
 
-  .piece-two,
+  .piece-two {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: stretch;
+    aspect-ratio: 4 / 3;
+  }
+
   .piece-three {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: stretch;
     aspect-ratio: 4 / 3;
   }
 
@@ -507,6 +519,19 @@
   .still-two,
   .still-three {
     width: 66%;
+  }
+}
+
+@media (max-width: 520px) {
+  .dali-disruption-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .piece-one,
+  .piece-two,
+  .piece-three {
+    grid-column: 1;
+    grid-row: auto;
   }
 }
 
