@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [bulkValue, setBulkValue] = useState('');
   const [bulkSaving, setBulkSaving] = useState(false);
   const [deletingCategoriaId, setDeletingCategoriaId] = useState('');
+  const [updatingCategoriaId, setUpdatingCategoriaId] = useState('');
   const [categoriaAEliminar, setCategoriaAEliminar] = useState('');
   const [mensajeCategoria, setMensajeCategoria] = useState('');
 
@@ -130,6 +131,42 @@ const AdminDashboard = () => {
       setMensajeCategoria(error.message);
     } finally {
       setDeletingCategoriaId('');
+    }
+  };
+
+  const toggleCategoriaVisible = async (categoria) => {
+    if (!categoria || categoria.privada) return;
+
+    const categoriaKey = categoria._id || categoria.id;
+    const nextVisible = !(categoria.visible ?? true);
+    setUpdatingCategoriaId(categoriaKey);
+    setMensajeCategoria('');
+
+    try {
+      const res = await fetch(`${API_URL}/api/categorias/${categoriaKey}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...categoria,
+          visible: nextVisible
+        })
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'No se pudo actualizar la categoría');
+
+      clearCategoriasCache();
+      setCategorias(prev => prev.map(cat => (
+        (cat._id || cat.id) === categoriaKey
+          ? { ...cat, ...data, id: data.slug || cat.id }
+          : cat
+      )));
+      setMensajeCategoria(nextVisible ? 'Categoría visible en el sitio' : 'Categoría oculta del sitio');
+      setTimeout(() => setMensajeCategoria(''), 3000);
+    } catch (error) {
+      setMensajeCategoria(error.message);
+    } finally {
+      setUpdatingCategoriaId('');
     }
   };
 
@@ -319,20 +356,45 @@ const AdminDashboard = () => {
                     <p className="font-semibold truncate">{cat.nombre || cat.id}</p>
                     <p className="text-xs text-gray-400">
                       {cat.id} · {obrasCount} obra{obrasCount === 1 ? '' : 's'}
+                      {!(cat.visible ?? true) && (
+                        <span className="ml-2 rounded bg-amber-500/20 px-2 py-0.5 text-amber-300">
+                          Oculta
+                        </span>
+                      )}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteCategoria(cat);
-                    }}
-                    disabled={!canDelete || deletingCategoriaId === categoriaKey}
-                    title={obrasCount > 0 ? 'No se puede eliminar una categoría con obras' : 'Eliminar categoría'}
-                    className="shrink-0 rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
-                  >
-                    {deletingCategoriaId === categoriaKey ? '...' : 'Eliminar'}
-                  </button>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCategoriaVisible(cat);
+                      }}
+                      disabled={cat.privada || updatingCategoriaId === categoriaKey}
+                      title={cat.privada ? 'La colección privada se gestiona aparte' : 'Mostrar u ocultar del sitio público'}
+                      className={`rounded px-3 py-1 text-sm font-bold disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500 ${
+                        cat.visible ?? true
+                          ? 'bg-amber-600 hover:bg-amber-700'
+                          : 'bg-green-600 hover:bg-green-700'
+                      }`}
+                    >
+                      {updatingCategoriaId === categoriaKey
+                        ? '...'
+                        : (cat.visible ?? true) ? 'Ocultar' : 'Mostrar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteCategoria(cat);
+                      }}
+                      disabled={!canDelete || deletingCategoriaId === categoriaKey}
+                      title={obrasCount > 0 ? 'No se puede eliminar una categoría con obras' : 'Eliminar categoría'}
+                      className="rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
+                    >
+                      {deletingCategoriaId === categoriaKey ? '...' : 'Eliminar'}
+                    </button>
+                  </div>
                 </div>
               );
             })}
