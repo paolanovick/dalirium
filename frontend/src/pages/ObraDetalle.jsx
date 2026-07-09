@@ -4,24 +4,39 @@ import MainLayout from "../components/layout/MainLayout";
 import { getObraBySlug, getObrasByCategoria } from "../data/obras";
 import { getCategoriaById, WHATSAPP_NUMBER } from "../data/categorias";
 import ArtLoader from "../components/ArtLoader";
+import { useSEO } from "../hooks/useSEO";
+import { useCategorias } from "../hooks/useCategorias";
 
 const ObraDetalle = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  
+
   const [obra, setObra] = useState(null);
   const [obrasRelacionadas, setObrasRelacionadas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imagenActiva, setImagenActiva] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const { categorias } = useCategorias();
+
+  useSEO({
+    title: obra?.titulo ?? 'Obra',
+    description: obra?.descripcion
+      ? `${obra.descripcion} — Obra de Salvador Dalí en Galería Dalirium.`
+      : obra?.titulo
+        ? `${obra.titulo} — Obra original de Salvador Dalí. Galería virtual Dalirium.`
+        : undefined,
+    image: obra?.imagenes?.[0] ?? undefined,
+    url: obra ? `/obra/${obra.slug}` : undefined,
+    type: 'artwork',
+  });
 
   const cargarObra = useCallback(async () => {
     try {
       const data = await getObraBySlug(slug);
       setObra(data);
-      
+
       setImagenActiva(0);
-      
+
       if (data) {
         const relacionadas = await getObrasByCategoria(data.categoria);
         const filtradas = (relacionadas || [])
@@ -66,7 +81,7 @@ const ObraDetalle = () => {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl text-white mb-4">Obra no encontrada</h1>
-            <button 
+            <button
               onClick={() => navigate('/colecciones')}
               className="text-white/60 hover:text-white underline"
             >
@@ -78,7 +93,7 @@ const ObraDetalle = () => {
     );
   }
 
-  const categoria = getCategoriaById(obra.categoria);
+  const categoria = categorias.find((cat) => cat.id === obra.categoria) || getCategoriaById(obra.categoria);
   const imagenes = obra.imagenes || [obra.imagenPrincipal];
 
   const mensajeWhatsApp = encodeURIComponent(
@@ -109,7 +124,7 @@ const ObraDetalle = () => {
       <section className="px-4 md:px-8 lg:px-16 pb-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            
+
             <div className="space-y-4">
   {/* Imagen principal */}
   <div
@@ -174,8 +189,8 @@ const ObraDetalle = () => {
 
                 <div className="flex justify-between py-2 border-b border-white/5">
                   <span className="text-white/40 text-sm">Categoría</span>
-                  <Link 
-                    to={categoria?.path || '/colecciones'} 
+                  <Link
+                    to={categoria?.path || '/colecciones'}
                     className="text-white/80 text-sm hover:text-white transition-colors"
                   >
                     {categoria?.nombre || obra.categoria}
@@ -212,7 +227,7 @@ const ObraDetalle = () => {
             <h2 className="text-xl md:text-2xl font-light text-white mb-8">
               Otras obras de {categoria?.nombre || 'esta categoría'}
             </h2>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {obrasRelacionadas.map((obraRel) => (
                 <Link key={obraRel.id} to={`/obra/${obraRel.slug}`} className="group block">
@@ -232,11 +247,11 @@ const ObraDetalle = () => {
       )}
 
       {lightboxOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
           onClick={() => setLightboxOpen(false)}
         >
-          <button 
+          <button
             className="absolute top-4 right-4 text-white/70 hover:text-white p-2"
             onClick={() => setLightboxOpen(false)}
           >

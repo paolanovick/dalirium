@@ -5,6 +5,7 @@ import CategoriaDetalle from "../pages/CategoriaDetalle";
 import ObraDetalle from "../pages/ObraDetalle";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import ObraForm from "../pages/admin/ObraForm";
+import CategoriaForm from "../pages/admin/CategoriaForm";
 import ColeccionPrivada from "../pages/ColeccionPrivada";
 import AdminGuard from "../components/admin/AdminGuard";
 
@@ -22,6 +23,7 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
       <Route path="/admin/nueva" element={<AdminGuard><ObraForm /></AdminGuard>} />
       <Route path="/admin/editar/:id" element={<AdminGuard><ObraForm /></AdminGuard>} />
+      <Route path="/admin/categorias/nueva" element={<AdminGuard><CategoriaForm /></AdminGuard>} />
 
       <Route path="*" element={<Home />} />
     </Routes>

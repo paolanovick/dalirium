@@ -1,8 +1,17 @@
 import MainLayout from "../components/layout/MainLayout";
 import LazyCarousel from "../components/carousel/LazyCarousel";
-import { categorias } from "../data/categorias";
+import { useCategorias } from "../hooks/useCategorias";
+import { useSEO } from "../hooks/useSEO";
 
 const Colecciones = () => {
+  const { categorias } = useCategorias();
+
+  useSEO({
+    title: 'Colecciones',
+    description: 'Explorá todas las colecciones de obras de Salvador Dalí: litografías, cuadros, vajilla, medallas olímpicas y más.',
+    url: '/colecciones',
+  });
+
   return (
     <MainLayout>
       <section className="pt-32 md:pt-40 pb-12 px-4 text-center">

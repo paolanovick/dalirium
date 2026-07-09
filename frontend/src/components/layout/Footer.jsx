@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { categorias } from "../../data/categorias";
+import { useCategorias } from "../../hooks/useCategorias";
 
 const Footer = () => {
+  const { categorias } = useCategorias();
+
   return (
     <footer className="relative overflow-hidden mt-20">
       {/* LOGO DE FONDO */}

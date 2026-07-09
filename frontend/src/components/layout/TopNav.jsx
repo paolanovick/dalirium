@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { categorias } from "../../data/categorias";
+import { useCategorias } from "../../hooks/useCategorias";
 
 const TopNav = () => {
+  const { categorias } = useCategorias();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);

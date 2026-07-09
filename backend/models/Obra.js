@@ -14,11 +14,13 @@ const obraSchema = new mongoose.Schema({
   categoria: {
     type: String,
     required: true,
-    enum: ['botellas', 'gala-dali-dorado', 'fotos-textos', 'litografias', 'medallas-olimpicas', 'vajilla', 'esculturas', 'gala-lincoln', 'muro-de-los-lamentos', 'coleccion-privada']
+    lowercase: true,
+    trim: true
   },
   subcategoria: {
     type: String,
-    default: ''
+    default: '',
+    trim: true
   },
   imagenPrincipal: {
     type: String,

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Acceso = require('../models/Acceso');
-const Config = require('../models/Config');
+const Config = require('../Config');
 
 // Obtener o crear config inicial
 async function getConfig() {

@@ -4,6 +4,8 @@ import MainLayout from "../components/layout/MainLayout";
 import { getCategoriaById, getCategoriaByPath } from "../data/categorias";
 import { getObrasByCategoria } from "../data/obras";
 import ArtLoader from "../components/ArtLoader";
+import { useSEO } from "../hooks/useSEO";
+import { useCategorias } from "../hooks/useCategorias";
 
 const CategoriaDetalle = () => {
   const { categoriaId } = useParams();
@@ -13,13 +15,25 @@ const CategoriaDetalle = () => {
   const [filtro, setFiltro] = useState("todas");
   const [loading, setLoading] = useState(true);
   const [todasLasObras, setTodasLasObras] = useState([]);
+  const { categorias, loading: loadingCategorias } = useCategorias();
 
   const prevPathRef = useRef(location.pathname);
 
   const categoria = useMemo(() => {
-    if (categoriaId) return getCategoriaById(categoriaId);
-    return getCategoriaByPath(location.pathname);
-  }, [categoriaId, location.pathname]);
+    if (categoriaId) {
+      return categorias.find((cat) => cat.id === categoriaId) || getCategoriaById(categoriaId);
+    }
+
+    return categorias.find((cat) => cat.path === location.pathname) || getCategoriaByPath(location.pathname);
+  }, [categorias, categoriaId, location.pathname]);
+
+  useSEO({
+    title: categoria?.nombre ?? 'Colección',
+    description: categoria?.descripcion
+      ? `${categoria.descripcion} — Galería Dalirium.`
+      : `Obras de Salvador Dalí — ${categoria?.nombre ?? 'Colección'}. Galería virtual Dalirium.`,
+    url: categoriaId ? `/categoria/${categoriaId}` : location.pathname,
+  });
 
   // 🔹 CARGA REAL ASÍNCRONA
   useEffect(() => {
@@ -46,7 +60,7 @@ const CategoriaDetalle = () => {
     };
   }, [categoria]);
 
- 
+
   const obras =
     filtro === "todas"
       ? todasLasObras
@@ -61,6 +75,16 @@ const CategoriaDetalle = () => {
       Promise.resolve().then(() => setFiltro("todas"));
     }
   }, [location.pathname]);
+
+  if (!categoria && loadingCategorias) {
+    return (
+      <MainLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <ArtLoader text="Cargando colección..." />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!categoria) {
     return (
@@ -81,6 +105,8 @@ const CategoriaDetalle = () => {
       </MainLayout>
     );
   }
+
+  const imagenesCategoria = categoria.imagenes || [];
 
   return (
     <MainLayout>
@@ -107,7 +133,7 @@ const CategoriaDetalle = () => {
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <ArtLoader text="Cargando colección..." />
-          ) : (
+          ) : obras.length > 0 ? (
             <div className="grid grid-cols-4 gap-6">
               {obras.map((obra) => (
                 <Link
@@ -123,6 +149,19 @@ const CategoriaDetalle = () => {
                 </Link>
               ))}
             </div>
+          ) : imagenesCategoria.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {imagenesCategoria.map((imagen) => (
+                <img
+                  key={imagen}
+                  src={imagen}
+                  alt={categoria.nombre}
+                  className="w-full aspect-square object-cover"
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-white/50">Todavía no hay imágenes en esta colección.</p>
           )}
         </div>
       </section>

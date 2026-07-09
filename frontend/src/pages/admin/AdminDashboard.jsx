@@ -1,25 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchCategorias } from '../../data/categorias';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const CATEGORIAS = [
-  'gala-dali-dorado',
-  'fotos-textos',
-  'litografias',
-  'medallas-olimpicas',
-  'vajilla',
-  'esculturas',
-  'gala-lincoln',
-  'muro-de-los-lamentos',
-  'obras-en-reserva',
-  'botellas',
-  'coleccion-privada'
-];
 
 const AdminDashboard = () => {
   const [obras, setObras] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [categoriaActiva, setCategoriaActiva] = useState('botellas');
+  const [categoriaActiva, setCategoriaActiva] = useState('');
   const [codigoActual, setCodigoActual] = useState('');
   const [nuevoCodigo, setNuevoCodigo] = useState('');
   const [savingCodigo, setSavingCodigo] = useState(false);
@@ -31,8 +20,19 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchObras();
+    fetchCategoriasAdmin();
     fetchCodigo();
   }, []);
+
+  const fetchCategoriasAdmin = async () => {
+    try {
+      const data = await fetchCategorias({ admin: true, apiUrl: API_URL });
+      setCategorias(data);
+      setCategoriaActiva(prev => prev || data.find(cat => !cat.privada)?.id || data[0]?.id || 'botellas');
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    }
+  };
 
   const fetchCodigo = async () => {
     try {
@@ -134,6 +134,14 @@ const AdminDashboard = () => {
   const obrasFiltradas = obras.filter(obra => obra.categoria === categoriaActiva);
   const allSelected = obrasFiltradas.length > 0 && selectedIds.size === obrasFiltradas.length;
 
+  const getImagenThumb = (imagenPrincipal = '') => {
+    if (!imagenPrincipal) return '/logoFN.png';
+    if (imagenPrincipal.startsWith('http')) {
+      return imagenPrincipal.replace('/upload/', '/upload/w_80,h_80,c_fill/');
+    }
+    return `https://res.cloudinary.com/dnkm8v6eb/image/upload/w_80,h_80,c_fill/${imagenPrincipal}`;
+  };
+
   if (loading) {
     return <div className="p-8 text-white">Cargando...</div>;
   }
@@ -173,17 +181,20 @@ const AdminDashboard = () => {
             <Link to="/admin/nueva" className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">
               + Nueva Obra
             </Link>
+            <Link to="/admin/categorias/nueva" className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded">
+              + Nueva Categoría
+            </Link>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {CATEGORIAS.map(cat => (
+          {categorias.map(cat => (
             <button
-              key={cat}
-              onClick={() => { setCategoriaActiva(cat); setSelectedIds(new Set()); }}
-              className={`px-4 py-2 rounded text-sm ${categoriaActiva === cat ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'}`}
+              key={cat.id}
+              onClick={() => { setCategoriaActiva(cat.id); setSelectedIds(new Set()); }}
+              className={`px-4 py-2 rounded text-sm ${categoriaActiva === cat.id ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'}`}
             >
-              {cat}
+              {cat.nombre || cat.id}
             </button>
           ))}
         </div>
@@ -209,7 +220,7 @@ const AdminDashboard = () => {
                 className="p-2 bg-gray-800 border border-gray-600 rounded text-white text-sm outline-none"
               >
                 <option value="">-- Elegir --</option>
-                {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
+                {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre || c.id}</option>)}
               </select>
             )}
             {bulkField === 'titulo' && (
@@ -300,9 +311,7 @@ const AdminDashboard = () => {
                     </td>
                     <td className="p-3">
                       <img
-                        src={obra.imagenPrincipal.startsWith('http')
-                          ? obra.imagenPrincipal.replace('/upload/', '/upload/w_80,h_80,c_fill/')
-                          : `https://res.cloudinary.com/dnkm8v6eb/image/upload/w_80,h_80,c_fill/${obra.imagenPrincipal}`}
+                        src={getImagenThumb(obra.imagenPrincipal)}
                         alt={obra.titulo}
                         className="w-16 h-16 object-cover rounded"
                       />

@@ -133,13 +133,13 @@ const CategoryCarousel = ({
           return (
             <div
               key={obra.id}
-              className="absolute top-1/2 left-1/2 -translate-y-1/2 transition-all duration-700 ease-out cursor-pointer"
+              className={`absolute top-1/2 left-1/2 -translate-y-1/2 transition-all duration-700 ease-out ${obra.slug ? 'cursor-pointer' : ''}`}
               style={{
                 transform: `translateY(-50%) ${style.transform}`,
                 zIndex: style.zIndex,
                 opacity: style.opacity,
               }}
-              onClick={() => isActive && navigate(`/obra/${obra.slug}`)}
+              onClick={() => isActive && obra.slug && navigate(`/obra/${obra.slug}`)}
             >
               <div className="relative">
                 <img

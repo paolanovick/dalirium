@@ -2,11 +2,18 @@ import { useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import MainLayout from "../components/layout/MainLayout";
 import ScrollGallery from "../components/ScrollGallery";
+import { useSEO } from "../hooks/useSEO";
 
 
 const Home = () => {
   const carouselRef = useRef(null);
   const navigate = useNavigate();
+
+  useSEO({
+    title: 'Galería de Arte Salvador Dalí',
+    description: 'Galería virtual exclusiva de obras de Salvador Dalí. Cuadros, litografías, medallas olímpicas, vajilla y colección privada. Arte surrealista auténtico.',
+    url: '/',
+  });
 
   useEffect(() => {
     if (!carouselRef.current) return;

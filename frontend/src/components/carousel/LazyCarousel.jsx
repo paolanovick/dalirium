@@ -32,14 +32,25 @@ const LazyCarousel = ({ categoria }) => {
 
     getObrasByCategoria(categoria.id)
       .then((data) => {
-        setObras(data.slice(0, 6)); // Máximo 6 obras
+        const obrasCategoria = data.slice(0, 6);
+        const imagenesCategoria = (categoria.imagenes || []).slice(0, 6).map((imagen, index) => ({
+          id: `${categoria.id}-imagen-${index}`,
+          slug: '',
+          titulo: categoria.nombre,
+          categoria: categoria.id,
+          imagenPrincipal: imagen,
+          imagenes: [imagen],
+          orden: index
+        }));
+
+        setObras(obrasCategoria.length > 0 ? obrasCategoria : imagenesCategoria);
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
         setLoading(false);
       });
-  }, [isVisible, categoria.id]);
+  }, [isVisible, categoria.id, categoria.imagenes, categoria.nombre]);
 
   return (
     <div ref={ref} className="min-h-[400px]">

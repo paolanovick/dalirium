@@ -1,21 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { fetchCategorias } from '../../data/categorias';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-const CATEGORIAS = [
-  'gala-dali-dorado',
-  'fotos-textos',
-  'litografias',
-  'medallas-olimpicas',
-  'vajilla',
-  'esculturas',
-  'gala-lincoln',
-  'muro-de-los-lamentos',
-  'obras-en-reserva',
-  'botellas',
-  'coleccion-privada'
-];
 
 const ObraForm = () => {
   const { id } = useParams();
@@ -38,10 +25,34 @@ const ObraForm = () => {
     destacada: false
   });
 
+  const [categorias, setCategorias] = useState([]);
   const [cloudinaryImages, setCloudinaryImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchCategorias({ admin: true, apiUrl: API_URL })
+      .then(data => {
+        if (cancelled) return;
+        setCategorias(data);
+        setForm(prev => {
+          if (prev.categoria || !data.length) return prev;
+          return {
+            ...prev,
+            categoria: data[0].id,
+            subcategoria: data[0].id
+          };
+        });
+      })
+      .catch(err => console.error('Error cargando categorías:', err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Cargar obra si estamos editando
   useEffect(() => {
@@ -245,8 +256,11 @@ const ObraForm = () => {
                 onChange={handleChange}
                 className="w-full p-3 bg-gray-800 rounded border border-gray-700 focus:border-blue-500 outline-none"
               >
-                {CATEGORIAS.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                {(categorias.length === 0 || !categorias.some(cat => cat.id === form.categoria)) && form.categoria && (
+                  <option value={form.categoria}>{form.categoria}</option>
+                )}
+                {categorias.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre || cat.id}</option>
                 ))}
               </select>
             </div>
