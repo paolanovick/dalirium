@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchCategorias } from '../../data/categorias';
+import { clearCategoriasCache, fetchCategorias } from '../../data/categorias';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -17,6 +17,8 @@ const AdminDashboard = () => {
   const [bulkField, setBulkField] = useState('categoria');
   const [bulkValue, setBulkValue] = useState('');
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [deletingCategoriaId, setDeletingCategoriaId] = useState('');
+  const [mensajeCategoria, setMensajeCategoria] = useState('');
 
   useEffect(() => {
     fetchObras();
@@ -91,6 +93,38 @@ const AdminDashboard = () => {
     }
   };
 
+  const deleteCategoria = async (categoria) => {
+    const obrasCount = obras.filter(obra => obra.categoria === categoria.id).length;
+    if (obrasCount > 0) return;
+
+    if (!confirm(`¿Eliminar la categoría "${categoria.nombre || categoria.id}"?`)) return;
+
+    setDeletingCategoriaId(categoria._id);
+    setMensajeCategoria('');
+
+    try {
+      const res = await fetch(`${API_URL}/api/categorias/${categoria._id}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'No se pudo eliminar la categoría');
+
+      clearCategoriasCache();
+      const nextCategorias = categorias.filter(cat => cat._id !== categoria._id);
+      setCategorias(nextCategorias);
+      if (categoriaActiva === categoria.id) {
+        setCategoriaActiva(nextCategorias.find(cat => !cat.privada)?.id || nextCategorias[0]?.id || '');
+      }
+      setMensajeCategoria('Categoría eliminada correctamente');
+      setTimeout(() => setMensajeCategoria(''), 3000);
+    } catch (error) {
+      setMensajeCategoria(error.message);
+    } finally {
+      setDeletingCategoriaId('');
+    }
+  };
+
   const toggleSelect = (id) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
@@ -133,6 +167,10 @@ const AdminDashboard = () => {
 
   const obrasFiltradas = obras.filter(obra => obra.categoria === categoriaActiva);
   const allSelected = obrasFiltradas.length > 0 && selectedIds.size === obrasFiltradas.length;
+  const obrasPorCategoria = obras.reduce((acc, obra) => {
+    acc[obra.categoria] = (acc[obra.categoria] || 0) + 1;
+    return acc;
+  }, {});
 
   const getImagenThumb = (imagenPrincipal = '') => {
     if (!imagenPrincipal) return '/logoFN.png';
@@ -197,6 +235,47 @@ const AdminDashboard = () => {
               {cat.nombre || cat.id}
             </button>
           ))}
+        </div>
+
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <h2 className="text-lg font-bold">Categorías</h2>
+            {mensajeCategoria && (
+              <span className={`text-sm ${mensajeCategoria.includes('correctamente') ? 'text-green-400' : 'text-red-400'}`}>
+                {mensajeCategoria}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {categorias.map(cat => {
+              const obrasCount = obrasPorCategoria[cat.id] || 0;
+              const canDelete = !cat.privada && obrasCount === 0 && cat._id;
+
+              return (
+                <div
+                  key={`manage-${cat.id}`}
+                  className="flex items-center justify-between gap-3 rounded border border-gray-700 bg-gray-900/60 px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate">{cat.nombre || cat.id}</p>
+                    <p className="text-xs text-gray-400">
+                      {cat.id} · {obrasCount} obra{obrasCount === 1 ? '' : 's'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => deleteCategoria(cat)}
+                    disabled={!canDelete || deletingCategoriaId === cat._id}
+                    title={obrasCount > 0 ? 'No se puede eliminar una categoría con obras' : 'Eliminar categoría'}
+                    className="shrink-0 rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
+                  >
+                    {deletingCategoriaId === cat._id ? '...' : 'Eliminar'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Barra de edición masiva */}
