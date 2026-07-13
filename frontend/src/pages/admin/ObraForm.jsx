@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { fetchCategorias } from '../../data/categorias';
+import { uploadImageToCloudinary } from '../../utils/cloudinaryUpload';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.triptest.com.ar/dalirium';
 
@@ -84,32 +85,18 @@ const ObraForm = () => {
     }
   };
 
-  // Subir imagen directo a Cloudinary
+  // Subir imagen a Cloudinary usando el backend firmado
   const handleUploadImage = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'dalirium_unsigned');
-      formData.append('folder', `dalirium/${form.categoria}`);
-
-      const res = await fetch('https://api.cloudinary.com/v1_1/dnkm8v6eb/image/upload', {
-        method: 'POST',
-        body: formData
+      const newImage = await uploadImageToCloudinary({
+        file,
+        folder: form.categoria,
+        apiUrl: API_URL
       });
-
-      if (!res.ok) throw new Error('Error al subir imagen');
-
-      const data = await res.json();
-      
-      const newImage = {
-        public_id: data.public_id,
-        url: data.secure_url,
-        thumbnail: data.secure_url.replace('/upload/', '/upload/w_150,h_150,c_fill/')
-      };
       
       // Agregar la nueva imagen al inicio del listado
       setCloudinaryImages(prev => [newImage, ...prev]);
@@ -124,7 +111,7 @@ const ObraForm = () => {
       alert('✅ Imagen subida correctamente');
     } catch (error) {
       console.error('Error:', error);
-      alert('❌ Error al subir la imagen');
+      alert(`❌ ${error.message}`);
     } finally {
       setUploading(false);
       e.target.value = '';

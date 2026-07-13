@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearCategoriasCache } from '../../data/categorias';
+import { uploadImageToCloudinary } from '../../utils/cloudinaryUpload';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://api.triptest.com.ar/dalirium';
 
@@ -60,19 +61,12 @@ const CategoriaForm = () => {
       const uploaded = [];
 
       for (const file of files) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'dalirium_unsigned');
-        formData.append('folder', `dalirium/${folderSlug}`);
-
-        const res = await fetch('https://api.cloudinary.com/v1_1/dnkm8v6eb/image/upload', {
-          method: 'POST',
-          body: formData
+        const image = await uploadImageToCloudinary({
+          file,
+          folder: folderSlug,
+          apiUrl: API_URL
         });
-
-        if (!res.ok) throw new Error('Error al subir una imagen');
-        const data = await res.json();
-        uploaded.push(data.secure_url);
+        uploaded.push(image.url);
       }
 
       setForm(prev => {
@@ -86,7 +80,7 @@ const CategoriaForm = () => {
       });
     } catch (error) {
       console.error(error);
-      alert('No se pudieron subir las imágenes.');
+      alert(error.message || 'No se pudieron subir las imágenes.');
     } finally {
       setUploading(false);
       e.target.value = '';

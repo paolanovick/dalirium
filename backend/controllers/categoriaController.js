@@ -95,14 +95,25 @@ const normalizeImages = (imagenes) =>
   Array.isArray(imagenes) ? imagenes.filter(Boolean) : [];
 
 const ensureDefaultCategorias = async () => {
-  await Promise.all(DEFAULT_CATEGORIAS.map((categoria) => {
-    const path = categoria.path || `/categoria/${categoria.slug}`;
-    return Categoria.updateOne(
-      { slug: categoria.slug },
-      { $setOnInsert: { ...categoria, path } },
+  const categoriasCount = await Categoria.estimatedDocumentCount();
+
+  if (categoriasCount === 0) {
+    await Promise.all(DEFAULT_CATEGORIAS.map((categoria) => {
+      const path = categoria.path || `/categoria/${categoria.slug}`;
+      return Categoria.updateOne(
+        { slug: categoria.slug },
+        { $setOnInsert: { ...categoria, path } },
+        { upsert: true }
+      );
+    }));
+  } else {
+    const privada = DEFAULT_CATEGORIAS.find((categoria) => categoria.slug === 'coleccion-privada');
+    await Categoria.updateOne(
+      { slug: privada.slug },
+      { $setOnInsert: { ...privada, path: privada.path || `/categoria/${privada.slug}` } },
       { upsert: true }
     );
-  }));
+  }
 
   const categoriasEnObras = await Obra.distinct('categoria');
   await Promise.all(categoriasEnObras.map((rawSlug, index) => {
@@ -242,6 +253,12 @@ exports.deleteCategoria = async (req, res, next) => {
     const categoria = await Categoria.findOne(lookup);
     if (!categoria) {
       return res.status(404).json({ error: 'Categoria no encontrada' });
+    }
+
+    if (categoria.privada || categoria.slug === 'coleccion-privada') {
+      return res.status(400).json({
+        error: 'La coleccion privada no se puede eliminar'
+      });
     }
 
     const obras = await Obra.countDocuments({ categoria: categoria.slug });
